@@ -1,0 +1,11 @@
+syntax:regexp
+^build/
+^dist/
+^docs/build/output
+.pyc$
+.orig$
+.egg-info
+.coverage
+.venv
+.windows_venv
+local_test
