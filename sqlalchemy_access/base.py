@@ -154,10 +154,10 @@ class AccessCompiler(compiler.SQLCompiler):
             return ""
 
     def visit_join(self, join, asfrom=False, **kwargs):
-        return (self.process(join.left, asfrom=True) + \
+        return ('(' + self.process(join.left, asfrom=True) + \
                 (join.isouter and " LEFT OUTER JOIN " or " INNER JOIN ") + \
                 self.process(join.right, asfrom=True) + " ON " + \
-                self.process(join.onclause))
+                self.process(join.onclause) + ')')
 
     def visit_extract(self, extract, **kw):
         field = self.extract_map.get(extract.field, extract.field)
