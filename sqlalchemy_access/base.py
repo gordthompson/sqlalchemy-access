@@ -136,7 +136,7 @@ class AccessCompiler(compiler.SQLCompiler):
                           'current_timestamp': 'now',
                           'length': 'len',
                           }
-    def visit_function(self, func):
+    def visit_function(self, func, **kwargs):
         """Access function names differ from the ANSI SQL names;
         rewrite common ones"""
         func.name = self.function_rewrites.get(func.name, func.name)
