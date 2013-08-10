@@ -24,7 +24,7 @@ Examples of pyodbc connection string URLs:
 from .base import AccessExecutionContext, AccessDialect
 from sqlalchemy.connectors.pyodbc import PyODBCConnector
 from sqlalchemy import types as sqltypes, util
-from sqlalchemy.util.compat import decimal
+import decimal
 
 class _AccessNumeric_pyodbc(sqltypes.Numeric):
     """Turns Decimals with adjusted() < 0 or > 7 into strings.
