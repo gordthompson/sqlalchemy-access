@@ -251,18 +251,13 @@ class AccessDialect(default.DefaultDialect):
 
 
     def has_table(self, connection, tablename, schema=None):
-        result = connection.scalar(
-                        sql.text(
-                            "select count(*) from msysobjects where "
-                            "type=1 and name=:name"), name=tablename
-                        )
+        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        result = pyodbc_crsr.tables(table=tablename).fetchone()
         return bool(result)
 
     @reflection.cache
     def get_table_names(self, connection, schema=None, **kw):
-        result = connection.execute("select name from msysobjects where "
-                "type=1 and name not like 'MSys%'")
-        table_names = [r[0] for r in result]
+        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        result = pyodbc_crsr.tables(tableType='TABLE').fetchall()
+        table_names = [r[2] for r in result]
         return table_names
-
-
