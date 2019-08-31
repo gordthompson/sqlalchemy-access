@@ -44,7 +44,7 @@ odbc_column_types = {
     pyodbc.SQL_TYPE_DATE: types.Date,
     pyodbc.SQL_TYPE_TIMESTAMP: types.DateTime,
     pyodbc.SQL_WVARCHAR: types.String,
-    -10: types.CLOB,  # reported by Access ODBC as LONGCHAR for Memo fields
+    -10: types.CLOB,  # reported by Access ODBC as LONGCHAR for "Long Text" (Memo) fields
 }
 
 
@@ -158,15 +158,26 @@ class AccessCompiler(compiler.SQLCompiler):
     def visit_cast(self, cast, **kwargs):
         return cast.clause._compiler_dispatch(self, **kwargs)
 
-    def visit_select_precolumns(self, select):
-        """Access puts TOP, it's version of LIMIT here """
-        s = select.distinct and "DISTINCT " or ""
-        if select.limit:
-            s += "TOP %s " % (select.limit)
-        if select.offset:
-            raise exc.InvalidRequestError(
-                    'Access does not support LIMIT with an offset')
-        return s
+    def get_select_precolumns(self, select, **kw):
+        # (plagiarized from mssql/base.py)
+        """ Access puts TOP, it's version of LIMIT here """
+
+        s = ""
+        if select._distinct:
+            s += "DISTINCT "
+
+        if select._simple_int_limit and not select._offset:
+            # ODBC drivers and possibly others
+            # don't support bind params in the SELECT clause on SQL Server.
+            # so have to use literal here.
+            s += "TOP %d " % select._limit
+
+        if s:
+            return s
+        else:
+            return compiler.SQLCompiler.get_select_precolumns(
+                self, select, **kw
+            )
 
     def limit_clause(self, select):
         """Limit in access is after the select keyword"""
