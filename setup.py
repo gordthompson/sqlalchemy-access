@@ -29,8 +29,8 @@ setup(name='sqlalchemy_access',
       license='MIT',
       packages=['sqlalchemy_access'],
       include_package_data=True,
-      tests_require=['nose >= 0.11'],
-      test_suite="nose.collector",
+      # tests_require=['nose >= 0.11'],
+      # test_suite="nose.collector",
       zip_safe=False,
       entry_points={
          'sqlalchemy.dialects': [
