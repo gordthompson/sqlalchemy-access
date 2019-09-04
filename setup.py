@@ -1,7 +1,7 @@
 import os
 import re
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 v = open(os.path.join(os.path.dirname(__file__), 'sqlalchemy_access', '__init__.py'))
 VERSION = re.compile(r".*__version__ = '(.*?)'", re.S).match(v.read()).group(1)
@@ -14,6 +14,10 @@ setup(name='sqlalchemy-access',
       version=VERSION,
       description="MS Access for SQLAlchemy",
       long_description=open(readme).read(),
+      url='https://github.com/sqlalchemy/sqlalchemy-access',
+      author='Gord Thompson',
+      author_email='gord@gordthompson.com',
+      license='MIT',
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Environment :: Console',
@@ -24,17 +28,18 @@ setup(name='sqlalchemy-access',
           'Topic :: Database :: Front-Ends',
       ],
       keywords='SQLAlchemy Microsoft Access',
-      author='Gord Thompson',
-      author_email='gord@gordthompson.com',
-      license='MIT',
-      packages=['sqlalchemy_access'],
+      project_urls={
+          'Documentation': 'https://github.com/sqlalchemy/sqlalchemy-access/wiki',
+          'Source': 'https://github.com/sqlalchemy/sqlalchemy-access',
+          'Tracker': 'https://github.com/sqlalchemy/sqlalchemy-access/issues',
+      },
+      packages=find_packages(include=['sqlalchemy_access']),
       include_package_data=True,
+      install_requires = ['SQLAlchemy', 'pyodbc>=4.0.27'],
       zip_safe=False,
       entry_points={
           'sqlalchemy.dialects': [
-              'access = sqlalchemy_access.pyodbc:AccessDialect_pyodbc',
               'access.pyodbc = sqlalchemy_access.pyodbc:AccessDialect_pyodbc',
-              ]
+          ]
       },
-      install_requires = ['SQLAlchemy', 'pyodbc>=4.0.27'],
 )
