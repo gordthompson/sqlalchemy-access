@@ -37,14 +37,17 @@ odbc_column_types = {
     pyodbc.SQL_CHAR: types.CHAR,
     pyodbc.SQL_DOUBLE: types.Float,
     pyodbc.SQL_FLOAT: types.Float,
+    pyodbc.SQL_GUID: types.String,
     pyodbc.SQL_INTEGER: types.Integer,
     pyodbc.SQL_LONGVARBINARY: types.LargeBinary,
     pyodbc.SQL_NUMERIC: types.Numeric,
     pyodbc.SQL_SMALLINT: types.SmallInteger,
+    pyodbc.SQL_TINYINT: types.SmallInteger,
     pyodbc.SQL_TYPE_DATE: types.Date,
     pyodbc.SQL_TYPE_TIMESTAMP: types.DateTime,
     pyodbc.SQL_WVARCHAR: types.String,
     -10: types.CLOB,  # reported by Access ODBC as LONGCHAR for "Long Text" (Memo) fields
+    7: types.Float,  # SINGLE
 }
 
 
