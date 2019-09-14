@@ -235,6 +235,9 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         """
         return "INTEGER"
 
+    def visit_BLOB(self, type_, **kw):
+        return "LONGBINARY"
+
     def visit_text(self, type_, **kw):
         """
         The default unqualified TEXT keyword is a synonym for TEXT(255) in Access DDL.
