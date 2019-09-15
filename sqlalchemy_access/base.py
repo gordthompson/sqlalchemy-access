@@ -337,6 +337,7 @@ class AccessDialect(default.DefaultDialect):
     name = 'access'
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
+    _need_decimal_fix = False
 
     poolclass = pool.SingletonThreadPool
     statement_compiler = AccessCompiler
