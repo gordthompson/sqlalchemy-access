@@ -1,5 +1,5 @@
 # access/base.py
-# Copyright (C) 2007-2012 the SQLAlchemy authors and contributors <see AUTHORS file>
+# Copyright (C) 2007-2019 the SQLAlchemy authors and contributors <see AUTHORS file>
 # Copyright (C) 2007 Paul Johnston, paj@pajhome.org.uk
 # Portions derived from jet2sql.py by Matt Keranen, mksql@yahoo.com
 #
@@ -18,42 +18,58 @@ from sqlalchemy import processors
 
 import pyodbc
 
+"""
+Map names returned by type_name column of pyodbc Cursor.columns method to SQLAlchemy types.
+
+These names are what you would retrieve from INFORMATION_SCHEMA.COLUMNS.DATA_TYPE if Access
+supported those types of system views.
+"""
 ischema_names = {
-    'INTEGER': types.Integer,
-    'SMALLINT': types.SmallInteger,
-    'NUMERIC': types.Numeric,
-    'FLOAT': types.Float,
-    'DATETIME': types.DateTime,
-    'DATE': types.Date,
-    'TEXT': types.String,
-    'BINARY': types.LargeBinary,
-    'YESNO': types.Boolean,
-    'CHAR': types.CHAR,
-    'TIMESTAMP': types.TIMESTAMP,
-}
-
-odbc_column_types = {
-    pyodbc.SQL_BIT: types.Boolean,
-    pyodbc.SQL_CHAR: types.CHAR,
-    pyodbc.SQL_DOUBLE: types.Float,
-    pyodbc.SQL_FLOAT: types.Float,
-    pyodbc.SQL_GUID: types.String,
-    pyodbc.SQL_INTEGER: types.Integer,
-    pyodbc.SQL_LONGVARBINARY: types.LargeBinary,
-    pyodbc.SQL_NUMERIC: types.Numeric,
-    pyodbc.SQL_SMALLINT: types.SmallInteger,
-    pyodbc.SQL_TINYINT: types.SmallInteger,
-    pyodbc.SQL_TYPE_DATE: types.Date,
-    pyodbc.SQL_TYPE_TIMESTAMP: types.DateTime,
-    pyodbc.SQL_WVARCHAR: types.String,
-    -10: types.CLOB,  # reported by Access ODBC as LONGCHAR for "Long Text" (Memo) fields
-    7: types.Float,  # SINGLE
+    'BIT': types.BOOLEAN,  # AcYesNo
+    'BYTE': types.SmallInteger,  # AcByte
+    'COUNTER': types.Integer,  # AcAutoNumber
+    'CURRENCY': types.Numeric,  # AcCurrency
+    'DATETIME': types.DATETIME,  # AcDateTime
+    'DECIMAL': types.DECIMAL,  # AcDecimal
+    'DOUBLE': types.FLOAT,  # AcDouble
+    'GUID': types.VARCHAR,
+    'INTEGER': types.INTEGER,  # AcLongInteger
+    'LONGBINARY': types.LargeBinary,  # AcOleObject
+    'LONGCHAR': types.Text,  # AcLongText
+    'REAL': types.REAL,  # AcSingle
+    'SMALLINT': types.SMALLINT,  # AcInteger
+    'VARCHAR': types.String,  # AcShortText
 }
 
 
-class AcNumeric(types.Numeric):
+class AcAutoNumber(types.Integer):
     def get_col_spec(self):
-        return "NUMERIC"
+        return "COUNTER"
+
+
+class AcByte(types.SmallInteger):
+    def get_col_spec(self):
+        return "TINYINT"
+
+
+class AcChar(types.CHAR):
+    def get_col_spec(self):
+        if self.length is None:
+            return "CHAR"  # defaults to 255
+        elif self.length in range(1, 256):
+            return "CHAR(%d)" % self.length
+        else:
+            raise ValueError("Char column width must be from 1 to 255 inclusive.")
+
+
+class AcCurrency(types.Numeric):
+    """
+    Internally the same as DECIMAL(19, 4), but defined as a separate column type in Access
+    so it can do clever things like display values according to the Windows locale (for
+    currency symbols and whatnot).
+    """
+    def get_col_spec(self):
+        return "CURRENCY"
 
     def bind_processor(self, dialect):
         return processors.to_str
@@ -62,7 +78,21 @@ class AcNumeric(types.Numeric):
         return None
 
 
-class AcFloat(types.Float):
+class AcDateTime(types.DATETIME):
+    def get_col_spec(self):
+        return "DATETIME"
+
+
+class AcDecimal(types.DECIMAL):
+    def get_col_spec(self):
+        return "DECIMAL"
+
+    def bind_processor(self, dialect):
+        """By converting to string, we can use Decimal types round-trip."""
+        return processors.to_str
+
+
+class AcDouble(types.FLOAT):
     def get_col_spec(self):
         return "FLOAT"
 
@@ -71,44 +101,19 @@ class AcFloat(types.Float):
         return processors.to_str
 
 
-class AcInteger(types.Integer):
-    def get_col_spec(self):
-        return "INTEGER"
-
-
-class AcTinyInteger(types.Integer):
-    def get_col_spec(self):
-        return "TINYINT"
-
-
-class AcSmallInteger(types.SmallInteger):
+class AcInteger(types.SMALLINT):
     def get_col_spec(self):
         return "SMALLINT"
 
 
-class AcDateTime(types.DateTime):
+class AcLongInteger(types.INTEGER):
     def get_col_spec(self):
-        return "DATETIME"
+        return "INTEGER"
 
 
-class AcDate(types.Date):
-    def get_col_spec(self):
-        return "DATETIME"
-
-
-class AcText(types.Text):
+class AcLongText(types.Text):
     def get_col_spec(self):
         return "MEMO"
-
-
-class AcString(types.String):
-    def get_col_spec(self):
-        return ("TEXT(%d)" % self.length) if self.length in range(1, 256) else "MEMO"
-
-
-class AcUnicode(types.Unicode):
-    def get_col_spec(self):
-        return ("TEXT(%d)" % self.length) if self.length in range(1, 256) else "MEMO"
 
     def bind_processor(self, dialect):
         return None
@@ -117,24 +122,33 @@ class AcUnicode(types.Unicode):
         return None
 
 
-class AcChar(types.CHAR):
+class AcOleObject(types.LargeBinary):
     def get_col_spec(self):
-        return ("TEXT(%d)" % self.length) if self.length in range(1, 256) else "MEMO"
+        return "OLEOBJECT"
 
 
-class AcBinary(types.LargeBinary):
+class AcShortText(types.String):
     def get_col_spec(self):
-        return "BINARY"
+        if self.length is None:
+            return "TEXT"  # defaults to 255
+        elif self.length in range(1, 256):
+            return "TEXT(%d)" % self.length
+        else:
+            raise ValueError("ShortText column width must be from 1 to 255 inclusive.")
 
 
-class AcBoolean(types.Boolean):
+class AcSingle(types.REAL):
+    def get_col_spec(self):
+        return "REAL"
+
+    def bind_processor(self, dialect):
+        """By converting to string, we can use Decimal types round-trip."""
+        return processors.to_str
+
+
+class AcYesNo(types.BOOLEAN):
     def get_col_spec(self):
         return "YESNO"
-
-
-class AcTimeStamp(types.TIMESTAMP):
-    def get_col_spec(self):
-        return "TIMESTAMP"
 
 
 class AccessExecutionContext(default.DefaultExecutionContext):
@@ -158,8 +172,8 @@ class AccessCompiler(compiler.SQLCompiler):
             'week': 'ww'
     })
 
-    def visit_cast(self, cast, **kwargs):
-        return cast.clause._compiler_dispatch(self, **kwargs)
+    def visit_cast(self, cast, **kw):
+        return cast.clause._compiler_dispatch(self, **kw)
 
     def get_select_precolumns(self, select, **kw):
         # (plagiarized from mssql/base.py)
@@ -182,7 +196,7 @@ class AccessCompiler(compiler.SQLCompiler):
                 self, select, **kw
             )
 
-    def limit_clause(self, select):
+    def limit_clause(self, select, **kw):
         """Limit in access is after the select keyword"""
         return ""
 
@@ -191,31 +205,31 @@ class AccessCompiler(compiler.SQLCompiler):
         return binary.operator == '%' and 'mod' or binary.operator
 
     function_rewrites = {'current_date': 'now',
-                          'current_timestamp': 'now',
-                          'length': 'len',
-                          }
+                         'current_timestamp': 'now',
+                         'length': 'len',
+                        }
 
-    def visit_function(self, func, **kwargs):
+    def visit_function(self, func, **kw):
         """Access function names differ from the ANSI SQL names;
         rewrite common ones"""
         func.name = self.function_rewrites.get(func.name, func.name)
         return super(AccessCompiler, self).visit_function(func)
 
-    def for_update_clause(self, select):
+    def for_update_clause(self, select, **kw):
         """FOR UPDATE is not supported by Access; silently ignore"""
         return ''
 
     # Strip schema
-    def visit_table(self, table, asfrom=False, **kwargs):
+    def visit_table(self, table, asfrom=False, **kw):
         if asfrom:
             return self.preparer.quote(table.name, table.quote)
         else:
             return ""
 
-    def visit_join(self, join, asfrom=False, **kwargs):
-        return ('(' + self.process(join.left, asfrom=True) + \
-                (join.isouter and " LEFT OUTER JOIN " or " INNER JOIN ") + \
-                self.process(join.right, asfrom=True) + " ON " + \
+    def visit_join(self, join, asfrom=False, **kw):
+        return ('(' + self.process(join.left, asfrom=True) +
+                (join.isouter and " LEFT OUTER JOIN " or " INNER JOIN ") +
+                self.process(join.right, asfrom=True) + " ON " +
                 self.process(join.onclause) + ')')
 
     def visit_extract(self, extract, **kw):
@@ -227,27 +241,38 @@ class AccessCompiler(compiler.SQLCompiler):
 class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_big_integer(self, type_, **kw):
         """
-        Squeeze BigInteger() into INTEGER (a.k.a. LONG) column by default until Access ODBC supports BIGINT
+        Squeeze BigInteger() into AcLongInteger by default until Access ODBC supports BIGINT
 
         If user needs to store true BIGINT values they can convert them to string, e.g., for a pandas DataFrame:
             df = df.astype({'id': numpy.str})  # convert "id" column from int64 to string
             df.to_sql("tablename", ...)
         """
-        return "INTEGER"
+        return AcLongInteger.get_col_spec(type_)
 
     def visit_BLOB(self, type_, **kw):
-        return "LONGBINARY"
+        return AcOleObject.get_col_spec(type_)
+
+    def visit_BOOLEAN(self, type_, **kw):
+        return AcYesNo.get_col_spec(type_)
+
+    def visit_integer(self, type_, **kw):
+        return AcAutoNumber.get_col_spec(type_)
+
+    def visit_numeric(self, type_, **kw):
+        return AcCurrency.get_col_spec(type_)
+
+    def visit_small_integer(self, type_, **kw):
+        return AcByte.get_col_spec(type_)
+
+    def visit_string(self, type_, **kw):
+        return AcShortText.get_col_spec(type_)
 
     def visit_text(self, type_, **kw):
-        """
-        The default unqualified TEXT keyword is a synonym for TEXT(255) in Access DDL.
-        Use MEMO to prevent longer strings from being truncated to 255 characters.
-        """
-        return "MEMO"
+        return AcLongText.get_col_spec(type_)
 
 
 class AccessDDLCompiler(compiler.DDLCompiler):
-    def get_column_specification(self, column, **kwargs):
+    def get_column_specification(self, column, **kw):
         if column.table is None:
             raise exc.CompileError(
                             "access requires Table-bound columns "
@@ -256,7 +281,7 @@ class AccessDDLCompiler(compiler.DDLCompiler):
         colspec = self.preparer.format_column(column)
         seq_col = column.table._autoincrement_column
         if seq_col is column:
-            colspec += " AUTOINCREMENT"
+            colspec += " COUNTER"
         else:
             colspec += " " + self.dialect.type_compiler.process(column.type)
 
@@ -313,6 +338,7 @@ class AccessIdentifierPreparer(compiler.IdentifierPreparer):
         'updatesecurity', 'upper', 'usage', 'user', 'using', 'value', 'values', 'varbinary', 'varchar', 'varying',
         'view', 'when', 'whenever', 'where', 'with', 'work', 'write', 'year', 'yesno', 'zone',
     ])
+
     def __init__(self, dialect):
         super(AccessIdentifierPreparer, self).\
                 __init__(dialect, initial_quote='[', final_quote=']')
@@ -320,21 +346,9 @@ class AccessIdentifierPreparer(compiler.IdentifierPreparer):
 
 class AccessDialect(default.DefaultDialect):
     colspecs = {
-        types.Unicode: AcUnicode,
-        types.Integer: AcInteger,
-        types.SmallInteger: AcSmallInteger,
-        types.Numeric: AcNumeric,
-        types.Float: AcFloat,
-        types.DateTime: AcDateTime,
-        types.Date: AcDate,
-        types.String: AcString,
-        types.LargeBinary: AcBinary,
-        types.Boolean: AcBoolean,
-        types.Text: AcText,
-        types.CHAR: AcChar,
-        types.TIMESTAMP: AcTimeStamp,
     }
     name = 'access'
+    supports_native_boolean = True  # suppress CHECK constraint on YesNo columns
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
     _need_decimal_fix = False
@@ -348,7 +362,9 @@ class AccessDialect(default.DefaultDialect):
 
     @classmethod
     def dbapi(cls):
-        return pyodbc
+        import pyodbc as module
+        module.pooling = False  # required for Access databases with ODBC linked tables
+        return module
 
     def create_connect_args(self, url):
         opts = url.translate_connect_args()
@@ -397,7 +413,7 @@ class AccessDialect(default.DefaultDialect):
         for row in pyodbc_crsr.columns(table=table_name):
             result.append({
                 'name': row.column_name,
-                'type': odbc_column_types[row.data_type],
+                'type': ischema_names[row.type_name],
                 'nullable': bool(row.nullable),
                 'autoincrement': (row.type_name == 'COUNTER'),
             })
