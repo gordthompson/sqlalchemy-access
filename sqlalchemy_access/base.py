@@ -27,6 +27,7 @@ supported those types of system views.
 ischema_names = {
     'BIT': types.BOOLEAN,  # AcYesNo
     'BYTE': types.SmallInteger,  # AcByte
+    'CHAR': types.CHAR,  # AcChar
     'COUNTER': types.Integer,  # AcAutoNumber
     'CURRENCY': types.Numeric,  # AcCurrency
     'DATETIME': types.DATETIME,  # AcDateTime
