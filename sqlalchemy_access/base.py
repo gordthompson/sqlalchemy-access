@@ -256,9 +256,6 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_BOOLEAN(self, type_, **kw):
         return AcYesNo.get_col_spec(type_)
 
-    def visit_integer(self, type_, **kw):
-        return AcAutoNumber.get_col_spec(type_)
-
     def visit_numeric(self, type_, **kw):
         return AcCurrency.get_col_spec(type_)
 
