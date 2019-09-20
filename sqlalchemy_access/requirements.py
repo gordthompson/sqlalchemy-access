@@ -34,9 +34,5 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
-    def tuple_in(self):
-        return exclusions.closed()
-
-    @property
     def unique_constraint_reflection(self):
         return exclusions.closed()

@@ -238,6 +238,20 @@ class AccessCompiler(compiler.SQLCompiler):
         return 'DATEPART("%s", %s)' % \
                     (field, self.process(extract.expr, **kw))
 
+    def visit_empty_set_expr(self, type_):
+        literal = None
+        repr_ = repr(type_[0])
+        if repr_.startswith('Integer('):
+            literal = "1"
+        elif repr_.startswith('String('):
+            literal = "'x'"
+        elif repr_.startswith('NullType('):
+            literal = "NULL"
+        else:
+            raise ValueError("Unknown type_: %s" % type(type_[0]))
+        stmt = "SELECT %s FROM USysSQLAlchemyDUAL WHERE 1=0" % literal
+        return stmt
+
 
 class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_big_integer(self, type_, **kw):
@@ -412,6 +426,8 @@ class AccessDialect(default.DefaultDialect):
             result.append({
                 'name': row.column_name,
                 'type': ischema_names[row.type_name],
+                'precision': row.column_size,
+                'scale': row.decimal_digits,
                 'nullable': bool(row.nullable),
                 'autoincrement': (row.type_name == 'COUNTER'),
                 'default': row.column_def,
@@ -452,5 +468,16 @@ class AccessDialect(default.DefaultDialect):
         raise NotImplementedError()
 
     def get_indexes(self, connection, table_name, schema=None, **kw):
-        # we might try using pyodbc's Cursor#statistics method someday, but for now ...
-        return []
+        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        indexes = {}
+        for row in pyodbc_crsr.statistics(table_name).fetchall():
+            if row.index_name is not None:
+                if row.index_name in indexes:
+                    indexes[row.index_name]['column_names'].add(row.column_name)
+                else:
+                    indexes[row.index_name] = {
+                        'name': row.index_name,
+                        'unique': row.non_unique == 0,
+                        'column_names': [row.column_name],
+                    }
+        return [x[1] for x in indexes.items()]
