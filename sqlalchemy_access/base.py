@@ -386,7 +386,7 @@ class AccessDialect(default.DefaultDialect):
     def get_table_names(self, connection, schema=None, **kw):
         pyodbc_crsr = connection.engine.raw_connection().cursor()
         result = pyodbc_crsr.tables(tableType='TABLE').fetchall()
-        table_names = [row.table_name for row in result]
+        table_names = [row.table_name for row in result if not row.table_name.lower().startswith('usys')]
         return table_names
 
     def _decode_sketchy_utf16(self, raw_bytes):
@@ -414,6 +414,7 @@ class AccessDialect(default.DefaultDialect):
                 'type': ischema_names[row.type_name],
                 'nullable': bool(row.nullable),
                 'autoincrement': (row.type_name == 'COUNTER'),
+                'default': row.column_def,
             })
         pyodbc_cnxn.add_output_converter(pyodbc.SQL_WVARCHAR, prev_converter)  # restore previous behaviour
         return result
