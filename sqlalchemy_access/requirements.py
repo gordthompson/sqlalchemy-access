@@ -9,6 +9,18 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
+    def date(self):
+        return exclusions.closed()
+
+    @property
+    def datetime_microseconds(self):
+        return exclusions.closed()
+
+    @property
+    def floats_to_four_decimals(self):
+        return exclusions.closed()
+
+    @property
     def foreign_key_constraint_reflection(self):
         return exclusions.closed()
 
@@ -32,6 +44,10 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
+    def precision_generic_float_type(self):
+        return exclusions.closed()
+
+    @property
     def primary_key_constraint_reflection(self):
         return exclusions.closed()
 
@@ -49,6 +65,18 @@ class Requirements(SuiteRequirements):
 
     @property
     def temporary_views(self):
+        return exclusions.closed()
+
+    @property
+    def time(self):
+        return exclusions.closed()
+
+    @property
+    def time_microseconds(self):
+        return exclusions.closed()
+
+    @property
+    def timestamp_microseconds(self):
         return exclusions.closed()
 
     @property
