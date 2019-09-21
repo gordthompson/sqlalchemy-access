@@ -29,7 +29,7 @@ ischema_names = {
     'BYTE': types.SmallInteger,  # AcByte
     'CHAR': types.CHAR,  # AcChar
     'COUNTER': types.Integer,  # AcAutoNumber
-    'CURRENCY': types.Numeric,  # AcCurrency
+    'CURRENCY': types.DECIMAL,  # AcCurrency
     'DATETIME': types.DATETIME,  # AcDateTime
     'DECIMAL': types.DECIMAL,  # AcDecimal
     'DOUBLE': types.FLOAT,  # AcDouble
@@ -63,14 +63,15 @@ class AcChar(types.CHAR):
             raise ValueError("Char column width must be from 1 to 255 inclusive.")
 
 
-class AcCurrency(types.Numeric):
+class AcCurrency(types.DECIMAL):
     """
     Internally the same as DECIMAL(19, 4), but defined as a separate column type in Access
     so it can do clever things like display values according to the Windows locale (for
     currency symbols and whatnot).
     """
+    ace_field_type = "CURRENCY"
     def get_col_spec(self):
-        return "CURRENCY"
+        return self.ace_field_type
 
     def bind_processor(self, dialect):
         return processors.to_str
@@ -276,8 +277,11 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_BOOLEAN(self, type_, **kw):
         return AcYesNo.get_col_spec(type_)
 
-    def visit_numeric(self, type_, **kw):
-        return AcCurrency.get_col_spec(type_)
+    def visit_DECIMAL(self, type_, **kw):
+        try:
+            return type_.ace_field_type  # for AcCurrency
+        except AttributeError:
+            return "DECIMAL(%d, %d)" % (type_.precision, type_.scale)
 
     def visit_small_integer(self, type_, **kw):
         return AcByte.get_col_spec(type_)
@@ -369,6 +373,7 @@ class AccessDialect(default.DefaultDialect):
     supports_native_boolean = True  # suppress CHECK constraint on YesNo columns
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
+    supports_simple_order_by_label = False
     _need_decimal_fix = False
 
     poolclass = pool.SingletonThreadPool
@@ -429,14 +434,18 @@ class AccessDialect(default.DefaultDialect):
         pyodbc_crsr = pyodbc_cnxn.cursor()
         result = []
         for row in pyodbc_crsr.columns(table=table_name):
+            type_ = ischema_names[row.type_name]
+            if type_ is types.String:
+                type_.length = row.column_size
+            elif type_ in [types.DECIMAL, types.Numeric]:
+                type_.precision = row.column_size
+                type_.scale = row.decimal_digits
             result.append({
                 'name': row.column_name,
-                'type': ischema_names[row.type_name],
-                'precision': row.column_size,
-                'scale': row.decimal_digits,
+                'type': type_,
                 'nullable': bool(row.nullable),
-                'autoincrement': (row.type_name == 'COUNTER'),
                 'default': row.column_def,
+                'autoincrement': (row.type_name == 'COUNTER'),
             })
         pyodbc_cnxn.add_output_converter(pyodbc.SQL_WVARCHAR, prev_converter)  # restore previous behaviour
         return result

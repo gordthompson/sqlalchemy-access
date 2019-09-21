@@ -2,7 +2,12 @@ from sqlalchemy.testing.requirements import SuiteRequirements
 
 from sqlalchemy.testing import exclusions
 
+
 class Requirements(SuiteRequirements):
+    @property
+    def bound_limit_offset(self):
+        return exclusions.closed()
+
     @property
     def foreign_key_constraint_reflection(self):
         return exclusions.closed()
@@ -14,11 +19,24 @@ class Requirements(SuiteRequirements):
     @property
     def nullable_booleans(self):
         """Target database allows boolean columns to store NULL."""
-        # Acccess Yes/No doesn't allow null
+        # Access Yes/No doesn't allow null
+        return exclusions.closed()
+
+    @property
+    def offset(self):
+        # Access does LIMIT (via TOP) but not OFFSET
+        return exclusions.closed()
+
+    @property
+    def parens_in_union_contained_select_w_limit_offset(self):
         return exclusions.closed()
 
     @property
     def primary_key_constraint_reflection(self):
+        return exclusions.closed()
+
+    @property
+    def sql_expression_limit_offset(self):
         return exclusions.closed()
 
     @property
