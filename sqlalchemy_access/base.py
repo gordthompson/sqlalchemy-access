@@ -205,6 +205,12 @@ class AccessCompiler(compiler.SQLCompiler):
         """Access uses "mod" instead of "%" """
         return binary.operator == '%' and 'mod' or binary.operator
 
+    def visit_concat_op_binary(self, binary, operator, **kw):
+        return "%s & %s" % (
+            self.process(binary.left, **kw),
+            self.process(binary.right, **kw),
+        )
+
     function_rewrites = {'current_date': 'now',
                          'current_timestamp': 'now',
                          'length': 'len',
