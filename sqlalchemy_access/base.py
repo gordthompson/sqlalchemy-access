@@ -18,30 +18,6 @@ from sqlalchemy import processors
 
 import pyodbc
 
-"""
-Map names returned by type_name column of pyodbc Cursor.columns method to SQLAlchemy types.
-
-These names are what you would retrieve from INFORMATION_SCHEMA.COLUMNS.DATA_TYPE if Access
-supported those types of system views.
-"""
-ischema_names = {
-    'BIT': types.BOOLEAN,  # AcYesNo
-    'BYTE': types.SmallInteger,  # AcByte
-    'CHAR': types.CHAR,  # AcChar
-    'COUNTER': types.Integer,  # AcAutoNumber
-    'CURRENCY': types.DECIMAL,  # AcCurrency
-    'DATETIME': types.DATETIME,  # AcDateTime
-    'DECIMAL': types.DECIMAL,  # AcDecimal
-    'DOUBLE': types.FLOAT,  # AcDouble
-    'GUID': types.VARCHAR,
-    'INTEGER': types.INTEGER,  # AcLongInteger
-    'LONGBINARY': types.LargeBinary,  # AcOleObject
-    'LONGCHAR': types.Text,  # AcLongText
-    'REAL': types.REAL,  # AcSingle
-    'SMALLINT': types.SMALLINT,  # AcInteger
-    'VARCHAR': types.String,  # AcShortText
-}
-
 
 class AcAutoNumber(types.Integer):
     def get_col_spec(self):
@@ -151,6 +127,31 @@ class AcSingle(types.REAL):
 class AcYesNo(types.BOOLEAN):
     def get_col_spec(self):
         return "YESNO"
+
+
+"""
+Map names returned by type_name column of pyodbc Cursor.columns method to SQLAlchemy types.
+
+These names are what you would retrieve from INFORMATION_SCHEMA.COLUMNS.DATA_TYPE if Access
+supported those types of system views.
+"""
+ischema_names = {
+    'BIT': types.BOOLEAN,  # AcYesNo
+    'BYTE': types.SmallInteger,  # AcByte
+    'CHAR': types.CHAR,  # AcChar
+    'COUNTER': types.Integer,  # AcAutoNumber
+    'CURRENCY': types.DECIMAL,  # AcCurrency
+    'DATETIME': types.DATETIME,  # AcDateTime
+    'DECIMAL': types.DECIMAL,  # AcDecimal
+    'DOUBLE': types.FLOAT,  # AcDouble
+    'GUID': types.VARCHAR,
+    'INTEGER': types.INTEGER,  # AcLongInteger
+    'LONGBINARY': types.LargeBinary,  # AcOleObject
+    'LONGCHAR': types.Text,  # AcLongText
+    'REAL': types.REAL,  # AcSingle
+    'SMALLINT': types.SMALLINT,  # AcInteger
+    'VARCHAR': types.String,  # AcShortText
+}
 
 
 class AccessExecutionContext(default.DefaultExecutionContext):
@@ -434,10 +435,11 @@ class AccessDialect(default.DefaultDialect):
         pyodbc_crsr = pyodbc_cnxn.cursor()
         result = []
         for row in pyodbc_crsr.columns(table=table_name):
-            type_ = ischema_names[row.type_name]
-            if type_ is types.String:
+            class_ = ischema_names[row.type_name]
+            type_ = class_()
+            if class_ is types.String:
                 type_.length = row.column_size
-            elif type_ in [types.DECIMAL, types.Numeric]:
+            elif class_ in [types.DECIMAL, types.Numeric]:
                 type_.precision = row.column_size
                 type_.scale = row.decimal_digits
             result.append({
