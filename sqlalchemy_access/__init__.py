@@ -1,7 +1,7 @@
 from sqlalchemy.dialects import registry as _registry
 
-from .base import AcAutoNumber, AcByte, AcChar, AcCurrency, AcDateTime, AcDecimal, AcDouble, AcInteger, AcLongInteger, \
-    AcLongText, AcOleObject, AcShortText, AcSingle, AcYesNo
+from .base import AutoNumber, Byte, Char, Currency, DateTime, Decimal, Double, Integer, LongInteger, \
+        LongText, OleObject, ShortText, Single, YesNo
 
 import pyodbc
 

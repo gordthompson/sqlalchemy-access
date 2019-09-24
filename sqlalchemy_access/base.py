@@ -18,115 +18,77 @@ from sqlalchemy import processors
 
 import pyodbc
 
-
-class AcAutoNumber(types.Integer):
-    def get_col_spec(self):
-        return "COUNTER"
-
-
-class AcByte(types.SmallInteger):
-    def get_col_spec(self):
-        return "TINYINT"
+# AutoNumber
+class COUNTER(types.Integer):
+    __visit_name__ = "COUNTER"
 
 
-class AcChar(types.CHAR):
-    def get_col_spec(self):
-        if self.length is None:
-            return "CHAR"  # defaults to 255
-        elif self.length in range(1, 256):
-            return "CHAR(%d)" % self.length
-        else:
-            raise ValueError("Char column width must be from 1 to 255 inclusive.")
+AutoNumber = COUNTER
 
 
-class AcCurrency(types.DECIMAL):
+class TINYINT(types.Integer):
+    __visit_name__ = "TINYINT"
+
+
+Byte = TINYINT
+
+
+# class AcChar(types.CHAR):
+#     def get_col_spec(self):
+#         if self.length is None:
+#             return "CHAR"  # defaults to 255
+#         elif self.length in range(1, 256):
+#             return "CHAR(%d)" % self.length
+#         else:
+#             raise ValueError("Char column width must be from 1 to 255 inclusive.")
+
+Char = types.CHAR
+
+
+class CURRENCY(types.DECIMAL):
     """
     Internally the same as DECIMAL(19, 4), but defined as a separate column type in Access
     so it can do clever things like display values according to the Windows locale (for
     currency symbols and whatnot).
     """
-    ace_field_type = "CURRENCY"
-    def get_col_spec(self):
-        return self.ace_field_type
+    __visit_name__ = "CURRENCY"
 
-    def bind_processor(self, dialect):
-        return processors.to_str
-
-    def result_processor(self, dialect, coltype):
-        return None
+    # def bind_processor(self, dialect):
+    #     return processors.to_str
+    #
+    # def result_processor(self, dialect, coltype):
+    #     return None
 
 
-class AcDateTime(types.DATETIME):
-    def get_col_spec(self):
-        return "DATETIME"
+Currency = CURRENCY
+DateTime = types.DATETIME
+Decimal = types.DECIMAL
+Double = types.FLOAT
+Integer = types.SMALLINT
+LongInteger = types.INTEGER
 
 
-class AcDecimal(types.DECIMAL):
-    def get_col_spec(self):
-        return "DECIMAL"
-
-    def bind_processor(self, dialect):
-        """By converting to string, we can use Decimal types round-trip."""
-        return processors.to_str
+class LONGCHAR(types.Text):
+    __visit_name__ = "LONGCHAR"
 
 
-class AcDouble(types.FLOAT):
-    def get_col_spec(self):
-        return "FLOAT"
-
-    def bind_processor(self, dialect):
-        """By converting to string, we can use Decimal types round-trip."""
-        return processors.to_str
+LongText = LONGCHAR
 
 
-class AcInteger(types.SMALLINT):
-    def get_col_spec(self):
-        return "SMALLINT"
+class OLEOBJECT(types.LargeBinary):
+    __visit_name__ = "OLEOBJECT"
 
 
-class AcLongInteger(types.INTEGER):
-    def get_col_spec(self):
-        return "INTEGER"
+OleObject = OLEOBJECT
+ShortText = types.String
+Single = types.REAL
 
 
-class AcLongText(types.Text):
-    def get_col_spec(self):
-        return "MEMO"
-
-    def bind_processor(self, dialect):
-        return None
-
-    def result_processor(self, dialect, coltype):
-        return None
+class YESNO(types.BOOLEAN):
+    __visit_name__ = "YESNO"
 
 
-class AcOleObject(types.LargeBinary):
-    def get_col_spec(self):
-        return "OLEOBJECT"
-
-
-class AcShortText(types.String):
-    def get_col_spec(self):
-        if self.length is None:
-            return "TEXT"  # defaults to 255
-        elif self.length in range(1, 256):
-            return "TEXT(%d)" % self.length
-        else:
-            raise ValueError("ShortText column width must be from 1 to 255 inclusive.")
-
-
-class AcSingle(types.REAL):
-    def get_col_spec(self):
-        return "REAL"
-
-    def bind_processor(self, dialect):
-        """By converting to string, we can use Decimal types round-trip."""
-        return processors.to_str
-
-
-class AcYesNo(types.BOOLEAN):
-    def get_col_spec(self):
-        return "YESNO"
+YesNo = YESNO
 
 
 """
@@ -136,21 +98,21 @@ These names are what you would retrieve from INFORMATION_SCHEMA.COLUMNS.DATA_TYP
 supported those types of system views.
 """
 ischema_names = {
-    'BIT': types.BOOLEAN,  # AcYesNo
-    'BYTE': types.SmallInteger,  # AcByte
-    'CHAR': types.CHAR,  # AcChar
-    'COUNTER': types.Integer,  # AcAutoNumber
-    'CURRENCY': types.DECIMAL,  # AcCurrency
-    'DATETIME': types.DATETIME,  # AcDateTime
-    'DECIMAL': types.DECIMAL,  # AcDecimal
-    'DOUBLE': types.FLOAT,  # AcDouble
+    'BIT': YesNo,
+    'BYTE': Byte,
+    'CHAR': Char,
+    'COUNTER': AutoNumber,
+    'CURRENCY': Currency,
+    'DATETIME': DateTime,
+    'DECIMAL': Decimal,
+    'DOUBLE': Double,
     'GUID': types.VARCHAR,
-    'INTEGER': types.INTEGER,  # AcLongInteger
-    'LONGBINARY': types.LargeBinary,  # AcOleObject
-    'LONGCHAR': types.Text,  # AcLongText
-    'REAL': types.REAL,  # AcSingle
-    'SMALLINT': types.SMALLINT,  # AcInteger
-    'VARCHAR': types.String,  # AcShortText
+    'INTEGER': LongInteger,
+    'LONGBINARY': OleObject,
+    'LONGCHAR': LongText,
+    'REAL': Single,
+    'SMALLINT': Integer,
+    'VARCHAR': ShortText,
 }
 
 
@@ -264,34 +226,42 @@ class AccessCompiler(compiler.SQLCompiler):
 class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_big_integer(self, type_, **kw):
         """
-        Squeeze BigInteger() into AcLongInteger by default until Access ODBC supports BIGINT
+        Squeeze SQLAlchemy BigInteger() into Access LongInteger by default until Access ODBC supports BIGINT
 
         If user needs to store true BIGINT values they can convert them to string, e.g., for a pandas DataFrame:
-            df = df.astype({'id': numpy.str})  # convert "id" column from int64 to string
-            df.to_sql("tablename", ...)
+            df.to_sql("tablename", engine, dtype={'colname': sa_a.ShortText(20)})
         """
-        return AcLongInteger.get_col_spec(type_)
-
-    def visit_BLOB(self, type_, **kw):
-        return AcOleObject.get_col_spec(type_)
+        return LongInteger.__visit_name__
 
     def visit_BOOLEAN(self, type_, **kw):
-        return AcYesNo.get_col_spec(type_)
+        return YESNO.__visit_name__
 
-    def visit_DECIMAL(self, type_, **kw):
-        try:
-            return type_.ace_field_type  # for AcCurrency
-        except AttributeError:
-            return "DECIMAL(%d, %d)" % (type_.precision, type_.scale)
+    def visit_COUNTER(self, type_, **kw):
+        return COUNTER.__visit_name__
 
-    def visit_small_integer(self, type_, **kw):
-        return AcByte.get_col_spec(type_)
+    def visit_CURRENCY(self, type_, **kw):
+        return CURRENCY.__visit_name__
 
-    def visit_string(self, type_, **kw):
-        return AcShortText.get_col_spec(type_)
+    # def visit_DECIMAL(self, type_, **kw):
+    #     try:
+    #         return type_.ace_field_type  # for AcCurrency
+    #     except AttributeError:
+    #         return "DECIMAL(%d, %d)" % (type_.precision, type_.scale)
 
-    def visit_text(self, type_, **kw):
-        return AcLongText.get_col_spec(type_)
+    def visit_OLEOBJECT(self, type_, **kw):
+        return OLEOBJECT.__visit_name__
+
+    # def visit_small_integer(self, type_, **kw):
+    #     return AcByte.get_col_spec(type_)
+    #
+    # def visit_string(self, type_, **kw):
+    #     return AcShortText.get_col_spec(type_)
+    #
+    # def visit_text(self, type_, **kw):
+    #     return AcLongText.get_col_spec(type_)
+
+    def visit_TINYINT(self, type_, **kw):
+        return TINYINT.__visit_name__
 
 
 class AccessDDLCompiler(compiler.DDLCompiler):
