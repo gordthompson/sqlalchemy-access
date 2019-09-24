@@ -25,10 +25,6 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
-    def index_reflection(self):
-        return exclusions.closed()
-
-    @property
     def nullable_booleans(self):
         """Target database allows boolean columns to store NULL."""
         # Access Yes/No doesn't allow null
@@ -77,8 +73,4 @@ class Requirements(SuiteRequirements):
 
     @property
     def timestamp_microseconds(self):
-        return exclusions.closed()
-
-    @property
-    def unique_constraint_reflection(self):
         return exclusions.closed()

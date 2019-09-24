@@ -31,17 +31,6 @@ class TINYINT(types.Integer):
 
 
 Byte = TINYINT
-
-
-# class AcChar(types.CHAR):
-#     def get_col_spec(self):
-#         if self.length is None:
-#             return "CHAR"  # defaults to 255
-#         elif self.length in range(1, 256):
-#             return "CHAR(%d)" % self.length
-#         else:
-#             raise ValueError("Char column width must be from 1 to 255 inclusive.")
-
 Char = types.CHAR
 
 
@@ -52,12 +41,6 @@ class CURRENCY(types.DECIMAL):
     currency symbols and whatnot).
     """
     __visit_name__ = "CURRENCY"
-
-    # def bind_processor(self, dialect):
-    #     return processors.to_str
-    #
-    # def result_processor(self, dialect, coltype):
-    #     return None
 
 
 Currency = CURRENCY
@@ -242,23 +225,8 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_CURRENCY(self, type_, **kw):
         return CURRENCY.__visit_name__
 
-    # def visit_DECIMAL(self, type_, **kw):
-    #     try:
-    #         return type_.ace_field_type  # for AcCurrency
-    #     except AttributeError:
-    #         return "DECIMAL(%d, %d)" % (type_.precision, type_.scale)
-
     def visit_OLEOBJECT(self, type_, **kw):
         return OLEOBJECT.__visit_name__
-
-    # def visit_small_integer(self, type_, **kw):
-    #     return AcByte.get_col_spec(type_)
-    #
-    # def visit_string(self, type_, **kw):
-    #     return AcShortText.get_col_spec(type_)
-    #
-    # def visit_text(self, type_, **kw):
-    #     return AcLongText.get_col_spec(type_)
 
     def visit_TINYINT(self, type_, **kw):
         return TINYINT.__visit_name__
@@ -460,7 +428,7 @@ class AccessDialect(default.DefaultDialect):
         for row in pyodbc_crsr.statistics(table_name).fetchall():
             if row.index_name is not None:
                 if row.index_name in indexes:
-                    indexes[row.index_name]['column_names'].add(row.column_name)
+                    indexes[row.index_name]['column_names'].append(row.column_name)
                 else:
                     indexes[row.index_name] = {
                         'name': row.index_name,
