@@ -63,6 +63,13 @@ class OLEOBJECT(types.LargeBinary):
 
 
 OleObject = OLEOBJECT
+
+
+class GUID(types.Integer):
+    __visit_name__ = "GUID"
+
+
+ReplicationID = GUID
 ShortText = types.String
 Single = types.REAL
 
@@ -75,7 +82,7 @@ YesNo = YESNO
 
 
 """
-Map names returned by type_name column of pyodbc Cursor.columns method to SQLAlchemy types.
+Map names returned by the "type_name" column of pyodbc's Cursor.columns method to our dialect types.
 
 These names are what you would retrieve from INFORMATION_SCHEMA.COLUMNS.DATA_TYPE if Access
 supported those types of system views.
@@ -89,7 +96,7 @@ ischema_names = {
     'DATETIME': DateTime,
     'DECIMAL': Decimal,
     'DOUBLE': Double,
-    'GUID': types.VARCHAR,
+    'GUID': ReplicationID,
     'INTEGER': LongInteger,
     'LONGBINARY': OleObject,
     'LONGCHAR': LongText,
@@ -211,7 +218,7 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         """
         Squeeze SQLAlchemy BigInteger() into Access LongInteger by default until Access ODBC supports BIGINT
 
-        If user needs to store true BIGINT values they can convert them to string, e.g., for a pandas DataFrame:
+        If a user needs to store true BIGINT values they can convert them to string, e.g., for a pandas DataFrame:
             df.to_sql("tablename", engine, dtype={'colname': sa_a.ShortText(20)})
         """
         return LongInteger.__visit_name__
@@ -224,6 +231,9 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_CURRENCY(self, type_, **kw):
         return CURRENCY.__visit_name__
+
+    def visit_GUID(self, type_, **kw):
+        return GUID.__visit_name__
 
     def visit_OLEOBJECT(self, type_, **kw):
         return OLEOBJECT.__visit_name__

@@ -1,7 +1,7 @@
 from sqlalchemy.dialects import registry as _registry
 
 from .base import AutoNumber, Byte, Char, Currency, DateTime, Decimal, Double, Integer, LongInteger, \
-        LongText, OleObject, ShortText, Single, YesNo
+        LongText, OleObject, ReplicationID, ShortText, Single, YesNo
 
 import pyodbc
 
