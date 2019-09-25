@@ -360,7 +360,8 @@ class AccessDialect(default.DefaultDialect):
     def get_table_names(self, connection, schema=None, **kw):
         pyodbc_crsr = connection.engine.raw_connection().cursor()
         result = pyodbc_crsr.tables(tableType='TABLE').fetchall()
-        table_names = [row.table_name for row in result if not row.table_name.lower().startswith('usys')]
+        table_names = [row.table_name for row in result
+                       if not (row.table_name.lower().startswith('usys') or row.table_name.startswith('~TMP'))]
         return table_names
 
     def _decode_sketchy_utf16(self, raw_bytes):
