@@ -241,6 +241,14 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_TINYINT(self, type_, **kw):
         return TINYINT.__visit_name__
 
+    def visit_TEXT(self, type_, **kw):
+        """ Access ODBC has an option named ExtendedAnsiSQL which defaults to zero. Using ExtendedAnsiSQL=1 is
+        recommended with this dialect because it enables DECIMAL(x, y) in DDL, but it also changes the behaviour
+        of TEXT (with no length specified). With ExtendedAnsiSQL=0, TEXT behaves like ShortText(255). With
+        ExtendedAnsiSQL=1, TEXT creates a LongText (Memo) field. This visit makes the behaviour consistent, and
+        helps ensure that string values longer than 255 characters do not get truncated by pandas to_sql."""
+        return LongText.__visit_name__
+
 
 class AccessDDLCompiler(compiler.DDLCompiler):
     def get_column_specification(self, column, **kw):
