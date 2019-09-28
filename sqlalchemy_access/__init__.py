@@ -5,7 +5,7 @@ from .base import AutoNumber, Byte, Char, Currency, DateTime, Decimal, Double, I
 
 import pyodbc
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 pyodbc.pooling = False  # required for Access databases with ODBC linked tables
 _registry.register("access.pyodbc", "sqlalchemy_access.pyodbc", "AccessDialect_pyodbc")

@@ -36,11 +36,15 @@ them if they are not already in place. To install, just::
 Getting Started
 ---------------
 
-Create an `ODBC DSN (Data Source Name) <https://support.microsoft.com/en-ca/help/966849/what-is-a-dsn-data-source-name>`_ that
-points to your Access database. Then, in your Python app, you can connect to the database via::
+Create an `ODBC DSN (Data Source Name)`_ that points to your Access database.
+(Tip: For best results, enable `ExtendedAnsiSQL`_.)
+Then, in your Python app, you can connect to the database via::
 
     from sqlalchemy import create_engine
     engine = create_engine("access+pyodbc://@your_dsn")
 
-For other ways of connecting see the `Getting Connected <https://github.com/sqlalchemy/sqlalchemy-access/wiki/Getting-Connected>`_
-page in the Wiki.
+For other ways of connecting see the `Getting Connected`_ page in the Wiki.
+
+.. _ODBC DSN (Data Source Name): https://support.microsoft.com/en-ca/help/966849/what-is-a-dsn-data-source-name
+.. _ExtendedAnsiSQL: https://github.com/sqlalchemy/sqlalchemy-access/wiki/%5Btip%5D-use-ExtendedAnsiSQL
+.. _Getting Connected: https://github.com/sqlalchemy/sqlalchemy-access/wiki/Getting-Connected
