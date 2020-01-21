@@ -1,6 +1,9 @@
 sqlalchemy-access
 =================
 
+.. image:: https://img.shields.io/pypi/dm/sqlalchemy-access.svg
+        :target: https://pypi.org/project/sqlalchemy-access/
+
 A Microsoft Access dialect for SQLAlchemy.
 
 Objectives
