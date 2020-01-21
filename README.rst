@@ -1,6 +1,9 @@
 sqlalchemy-access
 =================
 
+.. image:: https://img.shields.io/pypi/dm/sqlalchemy-access.svg
+        :target: https://pypi.org/project/sqlalchemy-access/
+
 A Microsoft Access dialect for SQLAlchemy.
 
 Objectives
@@ -48,3 +51,30 @@ For other ways of connecting see the `Getting Connected`_ page in the Wiki.
 .. _ODBC DSN (Data Source Name): https://support.microsoft.com/en-ca/help/966849/what-is-a-dsn-data-source-name
 .. _ExtendedAnsiSQL: https://github.com/sqlalchemy/sqlalchemy-access/wiki/%5Btip%5D-use-ExtendedAnsiSQL
 .. _Getting Connected: https://github.com/sqlalchemy/sqlalchemy-access/wiki/Getting-Connected
+
+The SQLAlchemy Project
+======================
+
+SQLAlchemy-access is part of the `SQLAlchemy Project <https://www.sqlalchemy.org>`_ and
+adheres to the same standards and conventions as the core project.
+
+Development / Bug reporting / Pull requests
+___________________________________________
+
+Please refer to the
+`SQLAlchemy Community Guide <https://www.sqlalchemy.org/develop.html>`_ for
+guidelines on coding and participating in this project.
+
+Code of Conduct
+_______________
+
+Above all, SQLAlchemy places great emphasis on polite, thoughtful, and
+constructive communication between users and developers.
+Please see our current Code of Conduct at
+`Code of Conduct <https://www.sqlalchemy.org/codeofconduct.html>`_.
+
+License
+=======
+
+SQLAlchemy-access is distributed under the `MIT license
+<https://opensource.org/licenses/MIT>`_.
