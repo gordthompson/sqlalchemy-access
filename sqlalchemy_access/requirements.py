@@ -74,3 +74,11 @@ class Requirements(SuiteRequirements):
     @property
     def timestamp_microseconds(self):
         return exclusions.closed()
+
+    @property
+    def unicode_ddl(self):
+        # Access ODBC does not support `SQLForeignKeys` so test teardown code
+        # cannot determine the correct order in which to drop the tables.
+        # And even if it did, Access won't let you drop a child table unless
+        # you drop the FK constraint first. Not worth the grief.
+        return exclusions.closed()
