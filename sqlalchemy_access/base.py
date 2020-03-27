@@ -655,6 +655,12 @@ class AccessDialect(default.DefaultDialect):
         ]
         return table_names
 
+    @reflection.cache
+    def get_view_names(self, connection, schema=None, **kw):
+        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        result = pyodbc_crsr.tables(tableType="VIEW").fetchall()
+        return [row[2] for row in result]
+
     def _decode_sketchy_utf16(self, raw_bytes):
         # work around bug in Access ODBC driver
         # ref: https://github.com/mkleehammer/pyodbc/issues/328
