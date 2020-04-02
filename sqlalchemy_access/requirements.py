@@ -82,3 +82,7 @@ class Requirements(SuiteRequirements):
         # And even if it did, Access won't let you drop a child table unless
         # you drop the FK constraint first. Not worth the grief.
         return exclusions.closed()
+
+    @property
+    def view_column_reflection(self):
+        return exclusions.open()
