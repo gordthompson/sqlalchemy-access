@@ -607,6 +607,8 @@ class AccessDialect(default.DefaultDialect):
     supports_simple_order_by_label = False
     _need_decimal_fix = False
 
+    supports_is_distinct_from = False
+
     poolclass = pool.SingletonThreadPool
     statement_compiler = AccessCompiler
     ddl_compiler = AccessDDLCompiler
