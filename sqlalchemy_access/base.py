@@ -655,6 +655,20 @@ class AccessDialect(default.DefaultDialect):
         ]
         return table_names
 
+    @reflection.cache
+    def get_view_names(self, connection, schema=None, **kw):
+        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        result = pyodbc_crsr.tables(tableType="VIEW").fetchall()
+        view_names = [
+            row.view_name
+            for row in result
+            if not (
+                row.view_name.lower().startswith("usys")
+                or row.view_name.startswith("~TMP")
+            )
+        ]
+        return view_names
+    
     def _decode_sketchy_utf16(self, raw_bytes):
         # work around bug in Access ODBC driver
         # ref: https://github.com/mkleehammer/pyodbc/issues/328
