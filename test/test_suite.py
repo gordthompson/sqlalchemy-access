@@ -1,3 +1,5 @@
+import pytest
+
 from sqlalchemy.testing.suite import *
 
 from sqlalchemy.testing.suite import (
@@ -17,7 +19,7 @@ from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_get_noncol_index_no_pk(cls):
         # This test actually passes, but if we bypass it then we don't get
         # a teardown error after the last test in this class. The related "pk"
@@ -25,19 +27,19 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         # bypass that one then the teardown error occurs, so skip them both.
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_get_noncol_index_pk(cls):
         # This test fails because Access automatically creates a unique
         # *index* (not constraint) on the primary key. The test is expecting
         # to see just one index (on a non-PK column) but it is seeing two.
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_get_unique_constraints(cls):
         # Access barfs on DDL trying to create a constraint named "i.have.dots"
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_nullable_reflection(cls):
         # Access ODBC implementation of the SQLColumns function reports that
         # a column is nullable even when it is not
@@ -45,7 +47,7 @@ class ComponentReflectionTest(_ComponentReflectionTest):
 
 
 class DateTimeTest(_DateTimeTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_null_bound_comparison(cls):
         # bypass this test because Access ODBC fails with
         # "Unrecognized keyword WHEN."
@@ -53,7 +55,7 @@ class DateTimeTest(_DateTimeTest):
 
 
 class ExpandingBoundInTest(_ExpandingBoundInTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_null_in_empty_set_is_false(cls):
         """ Access SQL can't do CASE ... WHEN, but this test would pass if we
             re-wrote the query to be
@@ -69,7 +71,7 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
 
 
 class InsertBehaviorTest(_InsertBehaviorTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_empty_insert(cls):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
@@ -77,7 +79,7 @@ class InsertBehaviorTest(_InsertBehaviorTest):
 
 
 class IntegerTest(_IntegerTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_huge_int(cls):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Optional feature not implemented.
@@ -85,19 +87,19 @@ class IntegerTest(_IntegerTest):
 
 
 class JoinTest(_JoinTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_inner_join_true(cls):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_inner_join_false(cls):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_outer_join_false(cls):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
@@ -105,53 +107,55 @@ class JoinTest(_JoinTest):
 
 
 class LikeFunctionsTest(_LikeFunctionsTest):
-    # Access SQL doesn't do ESCAPE
-    @classmethod
+    """ Access SQL doesn't do ESCAPE
+    """
+
+    @pytest.mark.skip()
     def test_contains_autoescape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_contains_autoescape_escape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_contains_escape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_endswith_autoescape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_endswith_autoescape_escape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_endswith_escape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_startswith_autoescape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_startswith_autoescape_escape(cls):
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_startswith_escape(cls):
         return
 
 
 class NumericTest(_NumericTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_decimal_coerce_round_trip(cls):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
         # https://github.com/mkleehammer/pyodbc/issues/624
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_decimal_coerce_round_trip_w_cast(cls):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
@@ -159,8 +163,25 @@ class NumericTest(_NumericTest):
         return
 
 
+class OperatorOverrideTest(fixtures.TablesTest):
+    @testing.provide_metadata
+    def test_not_equals_operator(self, connection):
+        # test for issue #6
+        tbl = Table(
+            "ne_test", self.metadata, Column("id", Integer, primary_key=True),
+        )
+        tbl.create(connection)
+        connection.execute(
+            tbl.insert(), [{"id": 1}],
+        )
+        result = connection.execute(tbl.select(tbl.c.id != 1)).fetchall()
+        eq_(len(result), 0)
+        result = connection.execute(tbl.select(tbl.c.id != 2)).fetchall()
+        eq_(len(result), 1)
+
+
 class OrderByLabelTest(_OrderByLabelTest):
-    @classmethod
+    @pytest.mark.skip()
     def test_composed_multiple(cls):
         # SELECT statement too complex for Access SQL
         # "Reserved error (-1001); there is no message for this error."
@@ -168,11 +189,11 @@ class OrderByLabelTest(_OrderByLabelTest):
 
 
 class TableDDLTest(_TableDDLTest):
-    # Access doesn't do schemas
-    @classmethod
+    @pytest.mark.skip()
     def test_create_table_schema(cls):
+        # Access doesn't do schemas
         return
 
-    @classmethod
+    @pytest.mark.skip()
     def test_underscore_names(cls):
         return

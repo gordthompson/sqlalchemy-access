@@ -21,7 +21,7 @@ from sqlalchemy import processors
 import pyodbc
 
 # The != operator override is required in order to make
-# the AccessCompiler class correctly format emmited queries
+# the AccessCompiler class correctly format emitted queries
 OPERATORS[ne] =  " <> "
 
 
