@@ -13,10 +13,17 @@ Support for the Microsoft Access database.
 """
 from sqlalchemy import sql, schema, types, exc, pool
 from sqlalchemy.sql import compiler, expression
+from sqlalchemy.sql.compiler import OPERATORS
+from sqlalchemy.sql.operators import ne, is_, isnot
 from sqlalchemy.engine import default, base, reflection
 from sqlalchemy import processors
 
 import pyodbc
+
+# The != operator override is required in order to make
+# the AccessCompiler class correctly format emitted queries
+OPERATORS[ne] =  " <> "
+
 
 # AutoNumber
 class COUNTER(types.Integer):
