@@ -20,11 +20,9 @@ from sqlalchemy import processors
 
 import pyodbc
 
-# These operator overrides are required in order to make
+# The != operator override is required in order to make
 # the AccessCompiler class correctly format emmited queries
 OPERATORS[ne] =  " <> "
-OPERATORS[is_] =  " = "
-OPERATORS[isnot] =  " <> "
 
 
 # AutoNumber
