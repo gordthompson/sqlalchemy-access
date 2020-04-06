@@ -11,18 +11,11 @@ Support for the Microsoft Access database.
 
 
 """
-from sqlalchemy import sql, schema, types, exc, pool
-from sqlalchemy.sql import compiler, expression
-from sqlalchemy.sql.compiler import OPERATORS
-from sqlalchemy.sql.operators import ne, is_, isnot
-from sqlalchemy.engine import default, base, reflection
-from sqlalchemy import processors
+from sqlalchemy import types, exc, pool
+from sqlalchemy.sql import compiler
+from sqlalchemy.engine import default, reflection
 
 import pyodbc
-
-# The != operator override is required in order to make
-# the AccessCompiler class correctly format emitted queries
-OPERATORS[ne] =  " <> "
 
 
 # AutoNumber
@@ -226,6 +219,12 @@ class AccessCompiler(compiler.SQLCompiler):
             raise ValueError("Unknown type_: %s" % type(type_[0]))
         stmt = "SELECT %s FROM USysSQLAlchemyDUAL WHERE 1=0" % literal
         return stmt
+
+    def visit_ne_binary(self, binary, operator, **kw):
+        return "%s <> %s" % (
+            self.process(binary.left),
+            self.process(binary.right),
+        )
 
 
 class AccessTypeCompiler(compiler.GenericTypeCompiler):
