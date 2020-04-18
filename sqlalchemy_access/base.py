@@ -300,6 +300,9 @@ class AccessDDLCompiler(compiler.DDLCompiler):
 
 
 class AccessIdentifierPreparer(compiler.IdentifierPreparer):
+    illegal_initial_characters = compiler.ILLEGAL_INITIAL_CHARACTERS.copy()
+    illegal_initial_characters.update(["_"])
+
     reserved_words = compiler.RESERVED_WORDS.copy()
     # https://support.office.com/en-us/article/learn-about-access-reserved-words-and-symbols-ae9d9ada-3255-4b12-91a9-f855bdd9c5a2
     reserved_words.update(
