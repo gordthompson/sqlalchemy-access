@@ -19,6 +19,8 @@ import pyodbc
 
 
 # AutoNumber
+
+
 class COUNTER(types.Integer):
     __visit_name__ = "COUNTER"
 
@@ -136,6 +138,8 @@ class AccessCompiler(compiler.SQLCompiler):
     def get_select_precolumns(self, select, **kw):
         # (plagiarized from mssql/base.py)
         """ Access puts TOP, it's version of LIMIT here """
+
+        s = super(AccessCompiler, self).get_select_precolumns(select, **kw)
 
         s = ""
         if select._distinct:
