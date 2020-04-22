@@ -137,26 +137,17 @@ class AccessCompiler(compiler.SQLCompiler):
 
     def get_select_precolumns(self, select, **kw):
         # (plagiarized from mssql/base.py)
-        """ Access puts TOP, it's version of LIMIT here """
 
         s = super(AccessCompiler, self).get_select_precolumns(select, **kw)
 
-        s = ""
-        if select._distinct:
-            s += "DISTINCT "
-
+        """ Access puts TOP, it's version of LIMIT here """
         if select._simple_int_limit and not select._offset:
             # ODBC drivers and possibly others
             # don't support bind params in the SELECT clause on SQL Server.
             # so have to use literal here.
             s += "TOP %d " % select._limit
 
-        if s:
-            return s
-        else:
-            return compiler.SQLCompiler.get_select_precolumns(
-                self, select, **kw
-            )
+        return s
 
     def limit_clause(self, select, **kw):
         """Limit in access is after the select keyword"""
