@@ -141,7 +141,9 @@ class AccessCompiler(compiler.SQLCompiler):
         s = super(AccessCompiler, self).get_select_precolumns(select, **kw)
 
         """ Access puts TOP, it's version of LIMIT here """
-        if select._simple_int_limit and not select._offset:
+        if select._offset:
+            raise NotImplementedError("Access SQL does not support OFFSET")
+        elif select._simple_int_limit:
             # ODBC drivers and possibly others
             # don't support bind params in the SELECT clause on SQL Server.
             # so have to use literal here.
