@@ -15,6 +15,7 @@ from sqlalchemy.testing.suite import JoinTest as _JoinTest
 from sqlalchemy.testing.suite import LikeFunctionsTest as _LikeFunctionsTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import OrderByLabelTest as _OrderByLabelTest
+from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
 from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 
 
@@ -185,6 +186,44 @@ class OrderByLabelTest(_OrderByLabelTest):
     def test_composed_multiple(cls):
         # SELECT statement too complex for Access SQL
         # "Reserved error (-1001); there is no message for this error."
+        return
+
+
+class QuotedNameArgumentTest(_QuotedNameArgumentTest):
+    @pytest.mark.skip()
+    def test_get_table_options(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_view_definition(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_columns(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_pk_constraint(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_foreign_keys(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_indexes(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_unique_constraints(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_table_comment(self, name):
+        return
+
+    @pytest.mark.skip()
+    def test_get_check_constraints(self, name):
         return
 
 
