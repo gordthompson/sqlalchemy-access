@@ -6,6 +6,7 @@ from sqlalchemy.testing.suite import (
     ComponentReflectionTest as _ComponentReflectionTest,
 )
 from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
+from sqlalchemy.testing.suite import ExistsTest as _ExistsTest
 from sqlalchemy.testing.suite import (
     ExpandingBoundInTest as _ExpandingBoundInTest,
 )
@@ -52,6 +53,20 @@ class DateTimeTest(_DateTimeTest):
     def test_null_bound_comparison(cls):
         # bypass this test because Access ODBC fails with
         # "Unrecognized keyword WHEN."
+        return
+
+
+class ExistsTest(_ExistsTest):
+    @pytest.mark.skip()
+    def test_select_exists(cls):
+        # bypass this test because Access ODBC fails with
+        # "SELECT statement includes a reserved word or an argument name ..."
+        return
+
+    @pytest.mark.skip()
+    def test_select_exists_false(cls):
+        # bypass this test because Access ODBC fails with
+        # "SELECT statement includes a reserved word or an argument name ..."
         return
 
 

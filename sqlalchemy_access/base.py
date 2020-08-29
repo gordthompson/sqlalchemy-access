@@ -11,6 +11,8 @@ Support for the Microsoft Access database.
 
 
 """
+import warnings
+
 from sqlalchemy import types, exc, pool
 from sqlalchemy.sql import compiler
 from sqlalchemy.engine import default, reflection
@@ -724,6 +726,14 @@ class AccessDialect(default.DefaultDialect):
         except pyodbc.InterfaceError as ie:
             if ie.args[0] == "IM001":
                 # ('IM001', '[IM001] [Microsoft][ODBC Driver Manager] Driver does not support this function (0) (SQLPrimaryKeys)')
+                warnings.warn(
+                    (
+                        'The Access ODBC driver does not support the ODBC "SQLPrimaryKeys" function. '
+                        "get_pk_constraint() is returning an empty list."
+                    ),
+                    exc.SAWarning,
+                    stacklevel=3,
+                )
                 return []
             else:
                 raise
@@ -738,6 +748,14 @@ class AccessDialect(default.DefaultDialect):
         except pyodbc.InterfaceError as ie:
             if ie.args[0] == "IM001":
                 # ('IM001', '[IM001] [Microsoft][ODBC Driver Manager] Driver does not support this function (0) (SQLForeignKeys)')
+                warnings.warn(
+                    (
+                        'The Access ODBC driver does not support the ODBC "SQLForeignKeys" function. '
+                        "get_foreign_keys() is returning an empty list."
+                    ),
+                    exc.SAWarning,
+                    stacklevel=3,
+                )
                 return []
             else:
                 raise
