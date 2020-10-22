@@ -12,11 +12,17 @@ from sqlalchemy.testing.suite import (
 )
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import IntegerTest as _IntegerTest
-from sqlalchemy.testing.suite import JoinTest as _JoinTest
+
+try:
+    from sqlalchemy.testing.suite import JoinTest as _JoinTest  # SQLA_1.4+
+except ImportError:
+    pass
 from sqlalchemy.testing.suite import LikeFunctionsTest as _LikeFunctionsTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import OrderByLabelTest as _OrderByLabelTest
-from sqlalchemy.testing.suite import QuotedNameArgumentTest as _QuotedNameArgumentTest
+from sqlalchemy.testing.suite import (
+    QuotedNameArgumentTest as _QuotedNameArgumentTest,
+)
 from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 
 
@@ -73,15 +79,15 @@ class ExistsTest(_ExistsTest):
 class ExpandingBoundInTest(_ExpandingBoundInTest):
     @pytest.mark.skip()
     def test_null_in_empty_set_is_false(cls):
-        """ Access SQL can't do CASE ... WHEN, but this test would pass if we
-            re-wrote the query to be
+        """Access SQL can't do CASE ... WHEN, but this test would pass if we
+        re-wrote the query to be
 
-                SELECT (n = 1) AS result
-                FROM
-                    (
-                        SELECT COUNT(*) AS n FROM USysSQLAlchemyDUAL
-                        WHERE NULL IN (SELECT NULL FROM USysSQLAlchemyDUAL WHERE 1=0)
-                    )
+            SELECT (n = 1) AS result
+            FROM
+                (
+                    SELECT COUNT(*) AS n FROM USysSQLAlchemyDUAL
+                    WHERE NULL IN (SELECT NULL FROM USysSQLAlchemyDUAL WHERE 1=0)
+                )
         """
         return
 
@@ -102,29 +108,34 @@ class IntegerTest(_IntegerTest):
         return
 
 
-class JoinTest(_JoinTest):
-    @pytest.mark.skip()
-    def test_inner_join_true(cls):
-        # bypass this test because Access ODBC fails with
-        # "JOIN expression not supported."
-        return
+try:
 
-    @pytest.mark.skip()
-    def test_inner_join_false(cls):
-        # bypass this test because Access ODBC fails with
-        # "JOIN expression not supported."
-        return
+    class JoinTest(_JoinTest):
+        @pytest.mark.skip()
+        def test_inner_join_true(cls):
+            # bypass this test because Access ODBC fails with
+            # "JOIN expression not supported."
+            return
 
-    @pytest.mark.skip()
-    def test_outer_join_false(cls):
-        # bypass this test because Access ODBC fails with
-        # "JOIN expression not supported."
-        return
+        @pytest.mark.skip()
+        def test_inner_join_false(cls):
+            # bypass this test because Access ODBC fails with
+            # "JOIN expression not supported."
+            return
+
+        @pytest.mark.skip()
+        def test_outer_join_false(cls):
+            # bypass this test because Access ODBC fails with
+            # "JOIN expression not supported."
+            return
+
+
+except NameError:
+    pass
 
 
 class LikeFunctionsTest(_LikeFunctionsTest):
-    """ Access SQL doesn't do ESCAPE
-    """
+    """Access SQL doesn't do ESCAPE"""
 
     @pytest.mark.skip()
     def test_contains_autoescape(cls):
@@ -184,11 +195,14 @@ class OperatorOverrideTest(fixtures.TablesTest):
     def test_not_equals_operator(self, connection):
         # test for issue #6
         tbl = Table(
-            "ne_test", self.metadata, Column("id", Integer, primary_key=True),
+            "ne_test",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
         )
         tbl.create(connection)
         connection.execute(
-            tbl.insert(), [{"id": 1}],
+            tbl.insert(),
+            [{"id": 1}],
         )
         result = connection.execute(tbl.select(tbl.c.id != 1)).fetchall()
         eq_(len(result), 0)

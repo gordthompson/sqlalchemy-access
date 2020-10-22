@@ -145,11 +145,27 @@ class AccessCompiler(compiler.SQLCompiler):
         """ Access puts TOP, it's version of LIMIT here """
         if select._offset:
             raise NotImplementedError("Access SQL does not support OFFSET")
-        elif select._simple_int_limit:
+        elif hasattr(select, "_simple_int_limit"):  # SQLA_1.3
+            if select._simple_int_limit:
+                # ODBC drivers and possibly others
+                # don't support bind params in the SELECT clause on SQL Server.
+                # so have to use literal here.
+                s += "TOP %d " % select._limit
+        elif select._has_row_limiting_clause and self._use_top(
+            select
+        ):  # SQLA_1.4
             # ODBC drivers and possibly others
             # don't support bind params in the SELECT clause on SQL Server.
             # so have to use literal here.
-            s += "TOP %d " % select._limit
+            kw["literal_execute"] = True
+            s += "TOP %s " % self.process(
+                self._get_limit_or_fetch(select), **kw
+            )
+            if select._fetch_clause is not None:
+                if select._fetch_clause_options["percent"]:
+                    s += "PERCENT "
+                if select._fetch_clause_options["with_ties"]:
+                    s += "WITH TIES "
 
         return s
 
@@ -225,6 +241,32 @@ class AccessCompiler(compiler.SQLCompiler):
             self.process(binary.right),
         )
 
+    def _get_limit_or_fetch(self, select):  # SQLA_1.4+
+        if select._fetch_clause is None:
+            return select._limit_clause
+        else:
+            return select._fetch_clause
+
+    def _use_top(self, select):  # SQLA_1.4+
+        return (
+            select._offset_clause is None
+            or (
+                select._simple_int_clause(select._offset_clause)
+                and select._offset == 0
+            )
+        ) and (
+            select._simple_int_clause(select._limit_clause)
+            or (
+                # limit can use TOP with is by itself. fetch only uses TOP
+                # when it needs to because of PERCENT and/or WITH TIES
+                select._simple_int_clause(select._fetch_clause)
+                and (
+                    select._fetch_clause_options["percent"]
+                    or select._fetch_clause_options["with_ties"]
+                )
+            )
+        )
+
 
 class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_big_integer(self, type_, **kw):
@@ -255,7 +297,7 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         return TINYINT.__visit_name__
 
     def visit_TEXT(self, type_, **kw):
-        """ Access ODBC has an option named ExtendedAnsiSQL which defaults to zero. Using ExtendedAnsiSQL=1 is
+        """Access ODBC has an option named ExtendedAnsiSQL which defaults to zero. Using ExtendedAnsiSQL=1 is
         recommended with this dialect because it enables DECIMAL(x, y) in DDL, but it also changes the behaviour
         of TEXT (with no length specified). With ExtendedAnsiSQL=0, TEXT behaves like ShortText(255). With
         ExtendedAnsiSQL=1, TEXT creates a LongText (Memo) field. This visit makes the behaviour consistent, and
