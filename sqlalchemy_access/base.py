@@ -76,7 +76,10 @@ class GUID(types.Integer):
 
 ReplicationID = GUID
 ShortText = types.String
-Single = types.REAL
+
+
+class Single(types.REAL):
+    __visit_name__ = "REAL"
 
 
 class YESNO(types.BOOLEAN):
@@ -290,6 +293,9 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_GUID(self, type_, **kw):
         return GUID.__visit_name__
 
+    def visit_LONGCHAR(self, type_, **kw):
+        return LONGCHAR.__visit_name__
+
     def visit_OLEOBJECT(self, type_, **kw):
         return OLEOBJECT.__visit_name__
 
@@ -303,9 +309,6 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         ExtendedAnsiSQL=1, TEXT creates a LongText (Memo) field. This visit makes the behaviour consistent, and
         helps ensure that string values longer than 255 characters do not get truncated by pandas to_sql."""
         return LongText.__visit_name__
-
-    def visit_LONGCHAR(self, type_, **kw):
-        return LONGCHAR.__visit_name__
 
 
 class AccessDDLCompiler(compiler.DDLCompiler):
