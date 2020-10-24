@@ -304,6 +304,9 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         helps ensure that string values longer than 255 characters do not get truncated by pandas to_sql."""
         return LongText.__visit_name__
 
+    def visit_LONGCHAR(self, type_, **kw):
+        return LONGCHAR.__visit_name__
+
 
 class AccessDDLCompiler(compiler.DDLCompiler):
     def get_column_specification(self, column, **kw):
