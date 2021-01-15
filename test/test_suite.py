@@ -3,7 +3,13 @@ import pytest
 from sqlalchemy.testing.suite import *
 
 from sqlalchemy.testing.suite import (
+    CastTypeDecoratorTest as _CastTypeDecoratorTest,
+)
+from sqlalchemy.testing.suite import (
     ComponentReflectionTest as _ComponentReflectionTest,
+)
+from sqlalchemy.testing.suite import (
+    ComponentReflectionTestExtra as _ComponentReflectionTestExtra,
 )
 from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
 from sqlalchemy.testing.suite import ExistsTest as _ExistsTest
@@ -26,20 +32,17 @@ from sqlalchemy.testing.suite import (
 from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 
 
-class ComponentReflectionTest(_ComponentReflectionTest):
+class CastTypeDecoratorTest(_CastTypeDecoratorTest):
     @pytest.mark.skip()
-    def test_get_noncol_index_no_pk(cls):
-        # This test actually passes, but if we bypass it then we don't get
-        # a teardown error after the last test in this class. The related "pk"
-        # test (immediately below) does need to be bypassed, but if we only
-        # bypass that one then the teardown error occurs, so skip them both.
+    def test_special_type(cls):
+        # Access SQL does not do CAST in the conventional way
         return
 
+
+class ComponentReflectionTest(_ComponentReflectionTest):
     @pytest.mark.skip()
-    def test_get_noncol_index_pk(cls):
-        # This test fails because Access automatically creates a unique
-        # *index* (not constraint) on the primary key. The test is expecting
-        # to see just one index (on a non-PK column) but it is seeing two.
+    def test_get_noncol_index(cls):
+        # Driver does not support this function (0) (SQLPrimaryKeys)
         return
 
     @pytest.mark.skip()
@@ -47,6 +50,8 @@ class ComponentReflectionTest(_ComponentReflectionTest):
         # Access barfs on DDL trying to create a constraint named "i.have.dots"
         return
 
+
+class ComponentReflectionTestExtra(_ComponentReflectionTestExtra):
     @pytest.mark.skip()
     def test_nullable_reflection(cls):
         # Access ODBC implementation of the SQLColumns function reports that
