@@ -12,6 +12,9 @@ from sqlalchemy.testing.suite import (
     ComponentReflectionTestExtra as _ComponentReflectionTestExtra,
 )
 from sqlalchemy.testing.suite import DateTimeTest as _DateTimeTest
+from sqlalchemy.testing.suite import (
+    DifficultParametersTest as _DifficultParametersTest,
+)
 from sqlalchemy.testing.suite import ExistsTest as _ExistsTest
 from sqlalchemy.testing.suite import (
     ExpandingBoundInTest as _ExpandingBoundInTest,
@@ -24,6 +27,9 @@ try:
 except ImportError:
     pass
 from sqlalchemy.testing.suite import LikeFunctionsTest as _LikeFunctionsTest
+from sqlalchemy.testing.suite import (
+    LongNameBlowoutTest as _LongNameBlowoutTest,
+)
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import OrderByLabelTest as _OrderByLabelTest
 from sqlalchemy.testing.suite import (
@@ -64,6 +70,14 @@ class DateTimeTest(_DateTimeTest):
     def test_null_bound_comparison(cls):
         # bypass this test because Access ODBC fails with
         # "Unrecognized keyword WHEN."
+        return
+
+
+class DifficultParametersTest(_DifficultParametersTest):
+    @pytest.mark.skip()
+    def test_round_trip(cls):
+        # bypass this test because "q?marks" case fails with
+        # "COUNT field incorrect"
         return
 
 
@@ -176,6 +190,13 @@ class LikeFunctionsTest(_LikeFunctionsTest):
 
     @pytest.mark.skip()
     def test_startswith_escape(cls):
+        return
+
+
+class LongNameBlowoutTest(_LongNameBlowoutTest):
+    @pytest.mark.skip()
+    def test_long_convention_name(cls):
+        # test generates names that are *way* too long for Access
         return
 
 
