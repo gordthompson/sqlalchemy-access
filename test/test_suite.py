@@ -21,11 +21,7 @@ from sqlalchemy.testing.suite import (
 )
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import IntegerTest as _IntegerTest
-
-try:
-    from sqlalchemy.testing.suite import JoinTest as _JoinTest  # SQLA_1.4+
-except ImportError:
-    pass
+from sqlalchemy.testing.suite import JoinTest as _JoinTest
 from sqlalchemy.testing.suite import LikeFunctionsTest as _LikeFunctionsTest
 from sqlalchemy.testing.suite import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
