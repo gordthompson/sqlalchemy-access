@@ -123,30 +123,24 @@ class IntegerTest(_IntegerTest):
         return
 
 
-try:
+class JoinTest(_JoinTest):
+    @pytest.mark.skip()
+    def test_inner_join_true(cls):
+        # bypass this test because Access ODBC fails with
+        # "JOIN expression not supported."
+        return
 
-    class JoinTest(_JoinTest):
-        @pytest.mark.skip()
-        def test_inner_join_true(cls):
-            # bypass this test because Access ODBC fails with
-            # "JOIN expression not supported."
-            return
+    @pytest.mark.skip()
+    def test_inner_join_false(cls):
+        # bypass this test because Access ODBC fails with
+        # "JOIN expression not supported."
+        return
 
-        @pytest.mark.skip()
-        def test_inner_join_false(cls):
-            # bypass this test because Access ODBC fails with
-            # "JOIN expression not supported."
-            return
-
-        @pytest.mark.skip()
-        def test_outer_join_false(cls):
-            # bypass this test because Access ODBC fails with
-            # "JOIN expression not supported."
-            return
-
-
-except NameError:
-    pass
+    @pytest.mark.skip()
+    def test_outer_join_false(cls):
+        # bypass this test because Access ODBC fails with
+        # "JOIN expression not supported."
+        return
 
 
 class LikeFunctionsTest(_LikeFunctionsTest):
