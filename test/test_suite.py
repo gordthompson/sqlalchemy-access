@@ -19,6 +19,7 @@ from sqlalchemy.testing.suite import ExistsTest as _ExistsTest
 from sqlalchemy.testing.suite import (
     ExpandingBoundInTest as _ExpandingBoundInTest,
 )
+from sqlalchemy.testing.suite import FetchLimitOffsetTest as _FetchLimitOffsetTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import IntegerTest as _IntegerTest
 from sqlalchemy.testing.suite import JoinTest as _JoinTest
@@ -32,6 +33,8 @@ from sqlalchemy.testing.suite import (
     QuotedNameArgumentTest as _QuotedNameArgumentTest,
 )
 from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
+
+# ----- test suite overrides -----
 
 
 class CastTypeDecoratorTest(_CastTypeDecoratorTest):
@@ -104,6 +107,14 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
                     WHERE NULL IN (SELECT NULL FROM USysSQLAlchemyDUAL WHERE 1=0)
                 )
         """
+        return
+
+
+class FetchLimitOffsetTest(_FetchLimitOffsetTest):
+    @pytest.mark.skip()
+    def test_limit_render_multiple_times(cls):
+        # bypass this test because Access ODBC fails with
+        # "Query input must contain at least one table or query."
         return
 
 
@@ -206,26 +217,6 @@ class NumericTest(_NumericTest):
         return
 
 
-class OperatorOverrideTest(fixtures.TablesTest):
-    @testing.provide_metadata
-    def test_not_equals_operator(self, connection):
-        # test for issue #6
-        tbl = Table(
-            "ne_test",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-        )
-        tbl.create(connection)
-        connection.execute(
-            tbl.insert(),
-            [{"id": 1}],
-        )
-        result = connection.execute(tbl.select(tbl.c.id != 1)).fetchall()
-        eq_(len(result), 0)
-        result = connection.execute(tbl.select(tbl.c.id != 2)).fetchall()
-        eq_(len(result), 1)
-
-
 class OrderByLabelTest(_OrderByLabelTest):
     @pytest.mark.skip()
     def test_composed_multiple(cls):
@@ -274,10 +265,30 @@ class QuotedNameArgumentTest(_QuotedNameArgumentTest):
 
 class TableDDLTest(_TableDDLTest):
     @pytest.mark.skip()
-    def test_create_table_schema(cls):
-        # Access doesn't do schemas
-        return
-
-    @pytest.mark.skip()
     def test_underscore_names(cls):
         return
+
+
+# ----- end of test suite overrides -----
+
+# ----- our dialect-specific tests -----
+
+
+class OperatorOverrideTest(fixtures.TablesTest):
+    @testing.provide_metadata
+    def test_not_equals_operator(self, connection):
+        # test for issue #6
+        tbl = Table(
+            "ne_test",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+        )
+        tbl.create(connection)
+        connection.execute(
+            tbl.insert(),
+            [{"id": 1}],
+        )
+        result = connection.execute(tbl.select(tbl.c.id != 1)).fetchall()
+        eq_(len(result), 0)
+        result = connection.execute(tbl.select(tbl.c.id != 2)).fetchall()
+        eq_(len(result), 1)

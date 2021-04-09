@@ -658,6 +658,7 @@ class AccessDialect(default.DefaultDialect):
     supports_native_boolean = (
         True  # suppress CHECK constraint on YesNo columns
     )
+    supports_schemas = False
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
     supports_simple_order_by_label = False
