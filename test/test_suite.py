@@ -1,5 +1,3 @@
-import pytest
-
 from sqlalchemy.testing.suite import *
 
 from sqlalchemy.testing.suite import (
@@ -38,26 +36,26 @@ from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 
 
 class CastTypeDecoratorTest(_CastTypeDecoratorTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_special_type(cls):
         # Access SQL does not do CAST in the conventional way
         return
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_get_noncol_index(cls):
         # Driver does not support this function (0) (SQLPrimaryKeys)
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_get_unique_constraints(cls):
         # Access barfs on DDL trying to create a constraint named "i.have.dots"
         return
 
 
 class ComponentReflectionTestExtra(_ComponentReflectionTestExtra):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_nullable_reflection(cls):
         # Access ODBC implementation of the SQLColumns function reports that
         # a column is nullable even when it is not
@@ -65,7 +63,7 @@ class ComponentReflectionTestExtra(_ComponentReflectionTestExtra):
 
 
 class DateTimeTest(_DateTimeTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_null_bound_comparison(cls):
         # bypass this test because Access ODBC fails with
         # "Unrecognized keyword WHEN."
@@ -73,7 +71,7 @@ class DateTimeTest(_DateTimeTest):
 
 
 class DifficultParametersTest(_DifficultParametersTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_round_trip(cls):
         # bypass this test because "q?marks" case fails with
         # "COUNT field incorrect"
@@ -81,13 +79,13 @@ class DifficultParametersTest(_DifficultParametersTest):
 
 
 class ExistsTest(_ExistsTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_select_exists(cls):
         # bypass this test because Access ODBC fails with
         # "SELECT statement includes a reserved word or an argument name ..."
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_select_exists_false(cls):
         # bypass this test because Access ODBC fails with
         # "SELECT statement includes a reserved word or an argument name ..."
@@ -95,8 +93,8 @@ class ExistsTest(_ExistsTest):
 
 
 class ExpandingBoundInTest(_ExpandingBoundInTest):
-    @pytest.mark.skip()
-    def test_null_in_empty_set_is_false(cls):
+    @testing.skip("access")
+    def test_null_in_empty_set_is_false_bindparam(cls):
         """Access SQL can't do CASE ... WHEN, but this test would pass if we
         re-wrote the query to be
 
@@ -109,9 +107,38 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
         """
         return
 
+    @testing.skip("access")
+    def test_null_in_empty_set_is_false_direct(cls):
+        return
+
+    @testing.skip("access")
+    def test_empty_set_against_integer_bindparam(cls):
+        return
+
+    @testing.skip("access")
+    def test_empty_set_against_integer_direct(cls):
+        return
+
+    @testing.skip("access")
+    def test_empty_set_against_string_bindparam(cls):
+        return
+
+    @testing.skip("access")
+    def test_empty_set_against_string_direct(cls):
+        return
+
+    @testing.skip("access")
+    def test_multiple_empty_sets_bindparam(cls):
+        return
+
+    @testing.skip("access")
+    def test_multiple_empty_sets_direct(cls):
+        return
+
+
 
 class FetchLimitOffsetTest(_FetchLimitOffsetTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_limit_render_multiple_times(cls):
         # bypass this test because Access ODBC fails with
         # "Query input must contain at least one table or query."
@@ -119,15 +146,21 @@ class FetchLimitOffsetTest(_FetchLimitOffsetTest):
 
 
 class InsertBehaviorTest(_InsertBehaviorTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_empty_insert(cls):
+        # bypass this test because Access ODBC fails with
+        # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
+        return
+
+    @testing.skip("access")
+    def test_empty_insert_multiple(cls):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
         return
 
 
 class IntegerTest(_IntegerTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_huge_int(cls):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Optional feature not implemented.
@@ -135,19 +168,19 @@ class IntegerTest(_IntegerTest):
 
 
 class JoinTest(_JoinTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_inner_join_true(cls):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_inner_join_false(cls):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_outer_join_false(cls):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
@@ -157,59 +190,59 @@ class JoinTest(_JoinTest):
 class LikeFunctionsTest(_LikeFunctionsTest):
     """Access SQL doesn't do ESCAPE"""
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_contains_autoescape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_contains_autoescape_escape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_contains_escape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_endswith_autoescape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_endswith_autoescape_escape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_endswith_escape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_startswith_autoescape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_startswith_autoescape_escape(cls):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_startswith_escape(cls):
         return
 
 
 class LongNameBlowoutTest(_LongNameBlowoutTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_long_convention_name(cls):
         # test generates names that are *way* too long for Access
         return
 
 
 class NumericTest(_NumericTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_decimal_coerce_round_trip(cls):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
         # https://github.com/mkleehammer/pyodbc/issues/624
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_decimal_coerce_round_trip_w_cast(cls):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
@@ -218,7 +251,7 @@ class NumericTest(_NumericTest):
 
 
 class OrderByLabelTest(_OrderByLabelTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_composed_multiple(cls):
         # SELECT statement too complex for Access SQL
         # "Reserved error (-1001); there is no message for this error."
@@ -226,45 +259,57 @@ class OrderByLabelTest(_OrderByLabelTest):
 
 
 class QuotedNameArgumentTest(_QuotedNameArgumentTest):
-    @pytest.mark.skip()
+    # suppress creation of test table(s) since that's where the errors occur
+    run_create_tables = None
+
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_table_options(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_view_definition(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_columns(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_pk_constraint(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_foreign_keys(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_indexes(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_unique_constraints(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_table_comment(self, name):
         return
 
-    @pytest.mark.skip()
+    @testing.skip("access")
+    @_QuotedNameArgumentTest.quote_fixtures
     def test_get_check_constraints(self, name):
         return
 
 
 class TableDDLTest(_TableDDLTest):
-    @pytest.mark.skip()
+    @testing.skip("access")
     def test_underscore_names(cls):
         return
 
