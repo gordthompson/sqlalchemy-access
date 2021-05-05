@@ -37,26 +37,26 @@ from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 
 class CastTypeDecoratorTest(_CastTypeDecoratorTest):
     @testing.skip("access")
-    def test_special_type(cls):
+    def test_special_type(self):
         # Access SQL does not do CAST in the conventional way
         return
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
     @testing.skip("access")
-    def test_get_noncol_index(cls):
+    def test_get_noncol_index(self):
         # Driver does not support this function (0) (SQLPrimaryKeys)
         return
 
     @testing.skip("access")
-    def test_get_unique_constraints(cls):
+    def test_get_unique_constraints(self):
         # Access barfs on DDL trying to create a constraint named "i.have.dots"
         return
 
 
 class ComponentReflectionTestExtra(_ComponentReflectionTestExtra):
     @testing.skip("access")
-    def test_nullable_reflection(cls):
+    def test_nullable_reflection(self):
         # Access ODBC implementation of the SQLColumns function reports that
         # a column is nullable even when it is not
         return
@@ -64,7 +64,7 @@ class ComponentReflectionTestExtra(_ComponentReflectionTestExtra):
 
 class DateTimeTest(_DateTimeTest):
     @testing.skip("access")
-    def test_null_bound_comparison(cls):
+    def test_null_bound_comparison(self):
         # bypass this test because Access ODBC fails with
         # "Unrecognized keyword WHEN."
         return
@@ -72,7 +72,7 @@ class DateTimeTest(_DateTimeTest):
 
 class DifficultParametersTest(_DifficultParametersTest):
     @testing.skip("access")
-    def test_round_trip(cls):
+    def test_round_trip(self):
         # bypass this test because "q?marks" case fails with
         # "COUNT field incorrect"
         return
@@ -80,13 +80,13 @@ class DifficultParametersTest(_DifficultParametersTest):
 
 class ExistsTest(_ExistsTest):
     @testing.skip("access")
-    def test_select_exists(cls):
+    def test_select_exists(self):
         # bypass this test because Access ODBC fails with
         # "SELECT statement includes a reserved word or an argument name ..."
         return
 
     @testing.skip("access")
-    def test_select_exists_false(cls):
+    def test_select_exists_false(self):
         # bypass this test because Access ODBC fails with
         # "SELECT statement includes a reserved word or an argument name ..."
         return
@@ -94,7 +94,7 @@ class ExistsTest(_ExistsTest):
 
 class ExpandingBoundInTest(_ExpandingBoundInTest):
     @testing.skip("access")
-    def test_null_in_empty_set_is_false_bindparam(cls):
+    def test_null_in_empty_set_is_false_bindparam(self):
         """Access SQL can't do CASE ... WHEN, but this test would pass if we
         re-wrote the query to be
 
@@ -108,38 +108,38 @@ class ExpandingBoundInTest(_ExpandingBoundInTest):
         return
 
     @testing.skip("access")
-    def test_null_in_empty_set_is_false_direct(cls):
+    def test_null_in_empty_set_is_false_direct(self):
         return
 
     @testing.skip("access")
-    def test_empty_set_against_integer_bindparam(cls):
+    def test_empty_set_against_integer_bindparam(self):
         return
 
     @testing.skip("access")
-    def test_empty_set_against_integer_direct(cls):
+    def test_empty_set_against_integer_direct(self):
         return
 
     @testing.skip("access")
-    def test_empty_set_against_string_bindparam(cls):
+    def test_empty_set_against_string_bindparam(self):
         return
 
     @testing.skip("access")
-    def test_empty_set_against_string_direct(cls):
+    def test_empty_set_against_string_direct(self):
         return
 
     @testing.skip("access")
-    def test_multiple_empty_sets_bindparam(cls):
+    def test_multiple_empty_sets_bindparam(self):
         return
 
     @testing.skip("access")
-    def test_multiple_empty_sets_direct(cls):
+    def test_multiple_empty_sets_direct(self):
         return
 
 
 
 class FetchLimitOffsetTest(_FetchLimitOffsetTest):
     @testing.skip("access")
-    def test_limit_render_multiple_times(cls):
+    def test_limit_render_multiple_times(self):
         # bypass this test because Access ODBC fails with
         # "Query input must contain at least one table or query."
         return
@@ -147,13 +147,13 @@ class FetchLimitOffsetTest(_FetchLimitOffsetTest):
 
 class InsertBehaviorTest(_InsertBehaviorTest):
     @testing.skip("access")
-    def test_empty_insert(cls):
+    def test_empty_insert(self):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
         return
 
     @testing.skip("access")
-    def test_empty_insert_multiple(cls):
+    def test_empty_insert_multiple(self):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
         return
@@ -161,7 +161,7 @@ class InsertBehaviorTest(_InsertBehaviorTest):
 
 class IntegerTest(_IntegerTest):
     @testing.skip("access")
-    def test_huge_int(cls):
+    def test_huge_int(self):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Optional feature not implemented.
         return
@@ -169,19 +169,19 @@ class IntegerTest(_IntegerTest):
 
 class JoinTest(_JoinTest):
     @testing.skip("access")
-    def test_inner_join_true(cls):
+    def test_inner_join_true(self):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
 
     @testing.skip("access")
-    def test_inner_join_false(cls):
+    def test_inner_join_false(self):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
 
     @testing.skip("access")
-    def test_outer_join_false(cls):
+    def test_outer_join_false(self):
         # bypass this test because Access ODBC fails with
         # "JOIN expression not supported."
         return
@@ -191,59 +191,59 @@ class LikeFunctionsTest(_LikeFunctionsTest):
     """Access SQL doesn't do ESCAPE"""
 
     @testing.skip("access")
-    def test_contains_autoescape(cls):
+    def test_contains_autoescape(self):
         return
 
     @testing.skip("access")
-    def test_contains_autoescape_escape(cls):
+    def test_contains_autoescape_escape(self):
         return
 
     @testing.skip("access")
-    def test_contains_escape(cls):
+    def test_contains_escape(self):
         return
 
     @testing.skip("access")
-    def test_endswith_autoescape(cls):
+    def test_endswith_autoescape(self):
         return
 
     @testing.skip("access")
-    def test_endswith_autoescape_escape(cls):
+    def test_endswith_autoescape_escape(self):
         return
 
     @testing.skip("access")
-    def test_endswith_escape(cls):
+    def test_endswith_escape(self):
         return
 
     @testing.skip("access")
-    def test_startswith_autoescape(cls):
+    def test_startswith_autoescape(self):
         return
 
     @testing.skip("access")
-    def test_startswith_autoescape_escape(cls):
+    def test_startswith_autoescape_escape(self):
         return
 
     @testing.skip("access")
-    def test_startswith_escape(cls):
+    def test_startswith_escape(self):
         return
 
 
 class LongNameBlowoutTest(_LongNameBlowoutTest):
     @testing.skip("access")
-    def test_long_convention_name(cls):
+    def test_long_convention_name(self):
         # test generates names that are *way* too long for Access
         return
 
 
 class NumericTest(_NumericTest):
     @testing.skip("access")
-    def test_decimal_coerce_round_trip(cls):
+    def test_decimal_coerce_round_trip(self):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
         # https://github.com/mkleehammer/pyodbc/issues/624
         return
 
     @testing.skip("access")
-    def test_decimal_coerce_round_trip_w_cast(cls):
+    def test_decimal_coerce_round_trip_w_cast(self):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
         # https://github.com/mkleehammer/pyodbc/issues/624
@@ -252,7 +252,7 @@ class NumericTest(_NumericTest):
 
 class OrderByLabelTest(_OrderByLabelTest):
     @testing.skip("access")
-    def test_composed_multiple(cls):
+    def test_composed_multiple(self):
         # SELECT statement too complex for Access SQL
         # "Reserved error (-1001); there is no message for this error."
         return
@@ -310,7 +310,7 @@ class QuotedNameArgumentTest(_QuotedNameArgumentTest):
 
 class TableDDLTest(_TableDDLTest):
     @testing.skip("access")
-    def test_underscore_names(cls):
+    def test_underscore_names(self):
         return
 
 
