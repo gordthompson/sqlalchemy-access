@@ -106,3 +106,12 @@ class AccessDialect_pyodbc(PyODBCConnector, AccessDialect):
     colspecs = util.update_copy(
         AccessDialect.colspecs, {sqltypes.Numeric: _AccessNumeric_pyodbc}
     )
+
+    @classmethod
+    def dbapi(cls):
+        import pyodbc as module
+
+        module.pooling = (
+            False  # required for Access databases with ODBC linked tables
+        )
+        return module

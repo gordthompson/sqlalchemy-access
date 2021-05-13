@@ -675,12 +675,8 @@ class AccessDialect(default.DefaultDialect):
 
     @classmethod
     def dbapi(cls):
-        import pyodbc as module
-
-        module.pooling = (
-            False  # required for Access databases with ODBC linked tables
-        )
-        return module
+        # implemented at the driver level (e.g., pyodbc)
+        raise NotImplementedError
 
     def create_connect_args(self, url):
         opts = url.translate_connect_args()
