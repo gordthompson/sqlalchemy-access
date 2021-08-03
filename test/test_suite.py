@@ -45,7 +45,7 @@ class CastTypeDecoratorTest(_CastTypeDecoratorTest):
 class ComponentReflectionTest(_ComponentReflectionTest):
     @testing.skip("access")
     def test_get_noncol_index(self):
-        # Driver does not support this function (0) (SQLPrimaryKeys)
+        # Access creates extra indexes that this test does not expect
         return
 
     @testing.skip("access")

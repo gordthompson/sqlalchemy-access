@@ -20,9 +20,11 @@ class Requirements(SuiteRequirements):
     def floats_to_four_decimals(self):
         return exclusions.closed()
 
+    # TODO: remove this when SQLA released with
+    #       https://gerrit.sqlalchemy.org/c/sqlalchemy/sqlalchemy/+/2990
     @property
-    def foreign_key_constraint_reflection(self):
-        return exclusions.closed()
+    def implicitly_named_constraints(self):
+        return exclusions.open()
 
     @property
     def nullable_booleans(self):
@@ -44,8 +46,8 @@ class Requirements(SuiteRequirements):
         return exclusions.closed()
 
     @property
-    def primary_key_constraint_reflection(self):
-        return exclusions.closed()
+    def reflects_pk_names(self):
+        return exclusions.open()
 
     @property
     def sql_expression_limit_offset(self):
@@ -77,9 +79,7 @@ class Requirements(SuiteRequirements):
 
     @property
     def unicode_ddl(self):
-        # Access ODBC does not support `SQLForeignKeys` so test teardown code
-        # cannot determine the correct order in which to drop the tables.
-        # And even if it did, Access won't let you drop a child table unless
+        # Access won't let you drop a child table unless
         # you drop the FK constraint first. Not worth the grief.
         return exclusions.closed()
 

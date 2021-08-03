@@ -31,8 +31,8 @@ then you can use the older 32-bit ``Microsoft Access Driver (*.mdb)`` that ships
 Co-requisites
 -------------
 
-This dialect requires SQLAlchemy and pyodbc. They are both specified as requirements so ``pip`` will install
-them if they are not already in place. To install, just::
+This dialect requires SQLAlchemy, pyodbc, and pywin32. They are specified as requirements so ``pip``
+will install them if they are not already in place. To install, just::
 
     pip install sqlalchemy-access
 

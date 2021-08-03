@@ -13,11 +13,12 @@ Support for the Microsoft Access database.
 """
 import warnings
 
-from sqlalchemy import types, exc, pool
+import pyodbc
+import pywintypes
+from sqlalchemy import types, exc, pool, util
 from sqlalchemy.sql import compiler
 from sqlalchemy.engine import default, reflection
-
-import pyodbc
+import win32com.client
 
 
 # AutoNumber
@@ -727,6 +728,7 @@ class AccessDialect(default.DefaultDialect):
             pass
         return s
 
+    @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):
         pyodbc_cnxn = connection.engine.raw_connection()
         # work around bug in Access ODBC driver
@@ -764,51 +766,65 @@ class AccessDialect(default.DefaultDialect):
             self, connection, table_name, schema=schema, **kw
         )
 
+    def _get_dao_string(self, crsr):
+        if crsr.connection.getinfo(pyodbc.SQL_DRIVER_NAME) == "odbcjt32.dll":
+            return "DAO.DBEngine.36"
+        else:
+            return "DAO.DBEngine.120"
+
+    @reflection.cache
     def get_pk_constraint(self, connection, table_name, schema=None, **kw):
         pyodbc_crsr = connection.engine.raw_connection().cursor()
-        try:
-            result = pyodbc_crsr.primaryKeys(table_name)
-        except pyodbc.InterfaceError as ie:
-            if ie.args[0] == "IM001":
-                # ('IM001', '[IM001] [Microsoft][ODBC Driver Manager] Driver does not support this function (0) (SQLPrimaryKeys)')
-                warnings.warn(
-                    (
-                        'The Access ODBC driver does not support the ODBC "SQLPrimaryKeys" function. '
-                        "get_pk_constraint() is returning an empty list."
-                    ),
-                    exc.SAWarning,
-                    stacklevel=3,
-                )
-                return []
-            else:
-                raise
-        except:
-            raise
-        return [row[3] for row in result]
+        db_path = pyodbc_crsr.tables(table=table_name).fetchval()
+        if db_path:
+            db_engine = win32com.client.Dispatch(
+                self._get_dao_string(pyodbc_crsr)
+            )
+            db = db_engine.OpenDatabase(db_path)
+            tbd = db.TableDefs(table_name)
+            for idx in tbd.Indexes:
+                if idx.Primary:
+                    return {
+                        "constrained_columns": [
+                            fld.Name for fld in idx.Fields
+                        ],
+                        "name": idx.Name,
+                    }
+        else:
+            util.raise_(
+                exc.NoSuchTableError("Table '%s' not found." % table_name),
+            )
 
+    @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
         pyodbc_crsr = connection.engine.raw_connection().cursor()
-        try:
-            result = pyodbc_crsr.foreignKeys(table_name)
-        except pyodbc.InterfaceError as ie:
-            if ie.args[0] == "IM001":
-                # ('IM001', '[IM001] [Microsoft][ODBC Driver Manager] Driver does not support this function (0) (SQLForeignKeys)')
-                warnings.warn(
-                    (
-                        'The Access ODBC driver does not support the ODBC "SQLForeignKeys" function. '
-                        "get_foreign_keys() is returning an empty list."
-                    ),
-                    exc.SAWarning,
-                    stacklevel=3,
-                )
-                return []
-            else:
-                raise
-        except:
-            raise
-        # this will tell us if Access ODBC ever starts supporting SQLForeignKeys
-        raise NotImplementedError()
+        db_path = pyodbc_crsr.tables(table=table_name).fetchval()
+        if db_path:
+            db_engine = win32com.client.Dispatch(
+                self._get_dao_string(pyodbc_crsr)
+            )
+            db = db_engine.OpenDatabase(db_path)
+            fk_list = []
+            for rel in db.Relations:
+                if rel.ForeignTable.casefold() == table_name.casefold():
+                    fk_dict = {
+                        "constrained_columns": [],
+                        "referred_schema": None,
+                        "referred_table": rel.Table,
+                        "referred_columns": [],
+                        "name": rel.Name,
+                    }
+                    for fld in rel.Fields:
+                        fk_dict["constrained_columns"].append(fld.ForeignName)
+                        fk_dict["referred_columns"].append(fld.Name)
+                    fk_list.append(fk_dict)
+            return fk_list
+        else:
+            util.raise_(
+                exc.NoSuchTableError("Table '%s' not found." % table_name),
+            )
 
+    @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):
         pyodbc_crsr = connection.engine.raw_connection().cursor()
         indexes = {}
