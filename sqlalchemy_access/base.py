@@ -780,7 +780,12 @@ class AccessDialect(default.DefaultDialect):
             db_engine = win32com.client.Dispatch(
                 self._get_dao_string(pyodbc_crsr)
             )
-            db = db_engine.OpenDatabase(db_path)
+            db = db_engine.OpenDatabase(
+                db_path,
+                False,
+                True,
+                "MS Access;PWD={}".format(connection.engine.url.password),
+            )
             tbd = db.TableDefs(table_name)
             for idx in tbd.Indexes:
                 if idx.Primary:
@@ -803,7 +808,12 @@ class AccessDialect(default.DefaultDialect):
             db_engine = win32com.client.Dispatch(
                 self._get_dao_string(pyodbc_crsr)
             )
-            db = db_engine.OpenDatabase(db_path)
+            db = db_engine.OpenDatabase(
+                db_path,
+                False,
+                True,
+                "MS Access;PWD={}".format(connection.engine.url.password),
+            )
             fk_list = []
             for rel in db.Relations:
                 if rel.ForeignTable.casefold() == table_name.casefold():
