@@ -693,13 +693,13 @@ class AccessDialect(default.DefaultDialect):
         return self.context.last_inserted_ids
 
     def has_table(self, connection, tablename, schema=None):
-        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        pyodbc_crsr = connection.connection.cursor()
         result = pyodbc_crsr.tables(table=tablename).fetchone()
         return bool(result)
 
     @reflection.cache
     def get_table_names(self, connection, schema=None, **kw):
-        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        pyodbc_crsr = connection.connection.cursor()
         result = pyodbc_crsr.tables(tableType="TABLE").fetchall()
         table_names = [
             row.table_name
@@ -713,7 +713,7 @@ class AccessDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_view_names(self, connection, schema=None, **kw):
-        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        pyodbc_crsr = connection.connection.cursor()
         result = pyodbc_crsr.tables(tableType="VIEW").fetchall()
         return [row[2] for row in result]
 
@@ -730,7 +730,7 @@ class AccessDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_columns(self, connection, table_name, schema=None, **kw):
-        pyodbc_cnxn = connection.engine.raw_connection()
+        pyodbc_cnxn = connection.connection
         # work around bug in Access ODBC driver
         # ref: https://github.com/mkleehammer/pyodbc/issues/328
         prev_converter = pyodbc_cnxn.get_output_converter(pyodbc.SQL_WVARCHAR)
@@ -774,7 +774,7 @@ class AccessDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_pk_constraint(self, connection, table_name, schema=None, **kw):
-        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        pyodbc_crsr = connection.connection.cursor()
         db_path = pyodbc_crsr.tables(table=table_name).fetchval()
         if db_path:
             db_engine = win32com.client.Dispatch(
@@ -802,7 +802,7 @@ class AccessDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
-        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        pyodbc_crsr = connection.connection.cursor()
         db_path = pyodbc_crsr.tables(table=table_name).fetchval()
         if db_path:
             db_engine = win32com.client.Dispatch(
@@ -836,7 +836,7 @@ class AccessDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):
-        pyodbc_crsr = connection.engine.raw_connection().cursor()
+        pyodbc_crsr = connection.connection.cursor()
         indexes = {}
         for row in pyodbc_crsr.statistics(table_name).fetchall():
             if row.index_name is not None:
