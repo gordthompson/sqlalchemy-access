@@ -99,6 +99,8 @@ class AccessExecutionContext_pyodbc(AccessExecutionContext):
 
 class AccessDialect_pyodbc(PyODBCConnector, AccessDialect):
 
+    supports_statement_cache = True
+
     execution_ctx_cls = AccessExecutionContext_pyodbc
 
     pyodbc_driver_name = "Microsoft Access"
