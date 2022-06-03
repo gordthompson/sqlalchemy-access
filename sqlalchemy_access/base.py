@@ -294,6 +294,9 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
     def visit_GUID(self, type_, **kw):
         return GUID.__visit_name__
 
+    def visit_large_binary(self, type_, **kw):
+        return OLEOBJECT.__visit_name__
+
     def visit_LONGCHAR(self, type_, **kw):
         return LONGCHAR.__visit_name__
 
