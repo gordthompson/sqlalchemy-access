@@ -697,7 +697,11 @@ class AccessDialect(default.DefaultDialect):
 
     def has_table(self, connection, tablename, schema=None):
         pyodbc_crsr = connection.connection.cursor()
-        result = pyodbc_crsr.tables(table=tablename).fetchone()
+        result = [
+            row.table_name
+            for row in pyodbc_crsr.tables().fetchall()
+            if row.table_name == tablename
+        ]
         return bool(result)
 
     @reflection.cache
@@ -778,7 +782,11 @@ class AccessDialect(default.DefaultDialect):
     @reflection.cache
     def get_pk_constraint(self, connection, table_name, schema=None, **kw):
         pyodbc_crsr = connection.connection.cursor()
-        db_path = pyodbc_crsr.tables(table=table_name).fetchval()
+        db_path = None
+        for row in pyodbc_crsr.tables():
+            if row.table_name == table_name:
+                db_path = row.table_cat
+                break
         if db_path:
             db_engine = win32com.client.Dispatch(
                 self._get_dao_string(pyodbc_crsr)
@@ -806,7 +814,11 @@ class AccessDialect(default.DefaultDialect):
     @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
         pyodbc_crsr = connection.connection.cursor()
-        db_path = pyodbc_crsr.tables(table=table_name).fetchval()
+        db_path = None
+        for row in pyodbc_crsr.tables():
+            if row.table_name == table_name:
+                db_path = row.table_cat
+                break
         if db_path:
             db_engine = win32com.client.Dispatch(
                 self._get_dao_string(pyodbc_crsr)
