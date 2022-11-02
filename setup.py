@@ -39,7 +39,7 @@ setup(
     },
     packages=find_packages(include=["sqlalchemy_access"]),
     include_package_data=True,
-    install_requires=["SQLAlchemy", "pyodbc>=4.0.27", "pywin32"],
+    install_requires=["SQLAlchemy>=2.0.0", "pyodbc>=4.0.27", "pywin32"],
     zip_safe=False,
     entry_points={
         "sqlalchemy.dialects": [

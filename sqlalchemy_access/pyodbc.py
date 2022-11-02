@@ -110,7 +110,7 @@ class AccessDialect_pyodbc(PyODBCConnector, AccessDialect):
     )
 
     @classmethod
-    def dbapi(cls):
+    def import_dbapi(cls):
         import pyodbc as module
 
         module.pooling = (

@@ -5,6 +5,10 @@ from sqlalchemy.testing import exclusions
 
 class Requirements(SuiteRequirements):
     @property
+    def array_type(self):
+        return exclusions.closed()
+
+    @property
     def bound_limit_offset(self):
         return exclusions.closed()
 
@@ -19,12 +23,6 @@ class Requirements(SuiteRequirements):
     @property
     def floats_to_four_decimals(self):
         return exclusions.closed()
-
-    # TODO: remove this when SQLA released with
-    #       https://gerrit.sqlalchemy.org/c/sqlalchemy/sqlalchemy/+/2990
-    @property
-    def implicitly_named_constraints(self):
-        return exclusions.open()
 
     @property
     def nullable_booleans(self):
@@ -82,6 +80,10 @@ class Requirements(SuiteRequirements):
         # Access won't let you drop a child table unless
         # you drop the FK constraint first. Not worth the grief.
         return exclusions.closed()
+
+    @property
+    def uuid_data_type(self):
+        return exclusions.open()
 
     @property
     def view_column_reflection(self):

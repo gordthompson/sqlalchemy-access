@@ -14,8 +14,7 @@ Support for the Microsoft Access database.
 import warnings
 
 import pyodbc
-import pywintypes
-from sqlalchemy import types, exc, pool, util
+from sqlalchemy import types, exc, pool
 from sqlalchemy.sql import compiler
 from sqlalchemy.engine import default, reflection
 import win32com.client
@@ -225,7 +224,7 @@ class AccessCompiler(compiler.SQLCompiler):
         field = self.extract_map.get(extract.field, extract.field)
         return 'DATEPART("%s", %s)' % (field, self.process(extract.expr, **kw))
 
-    def visit_empty_set_expr(self, type_):
+    def visit_empty_set_expr(self, type_, **kw):
         literal = None
         repr_ = repr(type_[0])
         if repr_.startswith("Integer("):
@@ -277,8 +276,8 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         """
         Squeeze SQLAlchemy BigInteger() into Access LongInteger by default until Access ODBC supports BIGINT
 
-        If a user needs to store true BIGINT values they can convert them to string, e.g., for a pandas DataFrame:
-            df.to_sql("tablename", engine, dtype={'colname': sa_a.ShortText(20)})
+        If we need to store BIGINT values we can use a Decimal column. Examples here:
+        https://github.com/gordthompson/sqlalchemy-access/wiki/%5Bpandas%5D-working-with-64-bit-integer-(BIGINT)-values
         """
         return LongInteger.__visit_name__
 
@@ -314,6 +313,9 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
         helps ensure that string values longer than 255 characters do not get truncated by pandas to_sql."""
         return LongText.__visit_name__
 
+    def visit_UUID(self, type_, **kw):
+        return GUID.__visit_name__
+
 
 class AccessDDLCompiler(compiler.DDLCompiler):
     def get_column_specification(self, column, **kw):
@@ -342,7 +344,7 @@ class AccessDDLCompiler(compiler.DDLCompiler):
 
         return colspec
 
-    def visit_drop_index(self, drop):
+    def visit_drop_index(self, drop, **kw):
         index = drop.element
         self.append(
             "\nDROP INDEX [%s].[%s]"
@@ -807,9 +809,7 @@ class AccessDialect(default.DefaultDialect):
                         "name": idx.Name,
                     }
         else:
-            util.raise_(
-                exc.NoSuchTableError("Table '%s' not found." % table_name),
-            )
+            raise exc.NoSuchTableError("Table '%s' not found." % table_name)
 
     @reflection.cache
     def get_foreign_keys(self, connection, table_name, schema=None, **kw):
@@ -845,9 +845,7 @@ class AccessDialect(default.DefaultDialect):
                     fk_list.append(fk_dict)
             return fk_list
         else:
-            util.raise_(
-                exc.NoSuchTableError("Table '%s' not found." % table_name),
-            )
+            raise exc.NoSuchTableError("Table '%s' not found." % table_name)
 
     @reflection.cache
     def get_indexes(self, connection, table_name, schema=None, **kw):

@@ -20,9 +20,8 @@ from sqlalchemy.testing.suite import (
 from sqlalchemy.testing.suite import (
     FetchLimitOffsetTest as _FetchLimitOffsetTest,
 )
-from sqlalchemy.testing.suite import (
-    HasTableTest as _HasTableTest,
-)
+from sqlalchemy.testing.suite import HasIndexTest as _HasIndexTest
+from sqlalchemy.testing.suite import HasTableTest as _HasTableTest
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import IntegerTest as _IntegerTest
 from sqlalchemy.testing.suite import JoinTest as _JoinTest
@@ -30,12 +29,15 @@ from sqlalchemy.testing.suite import LikeFunctionsTest as _LikeFunctionsTest
 from sqlalchemy.testing.suite import (
     LongNameBlowoutTest as _LongNameBlowoutTest,
 )
+from sqlalchemy.testing.suite import NativeUUIDTest as _NativeUUIDTest
 from sqlalchemy.testing.suite import NumericTest as _NumericTest
 from sqlalchemy.testing.suite import OrderByLabelTest as _OrderByLabelTest
 from sqlalchemy.testing.suite import (
     QuotedNameArgumentTest as _QuotedNameArgumentTest,
 )
+from sqlalchemy.testing.suite import StringTest as _StringTest
 from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
+from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 
 
 class CastTypeDecoratorTest(_CastTypeDecoratorTest):
@@ -47,13 +49,47 @@ class CastTypeDecoratorTest(_CastTypeDecoratorTest):
 
 class ComponentReflectionTest(_ComponentReflectionTest):
     @testing.skip("access")
+    def test_get_indexes(self):
+        # Access does not support all options tested
+        return
+
+    @testing.skip("access")
+    def test_get_multi_columns(self):
+        # tests fail due to ODBC driver bug always reporting nullable=True
+        return
+
+    @testing.skip("access")
+    def test_get_multi_indexes(self):
+        # tests fail because we don't support table/column comments
+        return
+
+    @testing.skip("access")
+    def test_get_multi_pk_constraint(self):
+        # Access does not support all options tested
+        return
+
+    @testing.skip("access")
+    def test_get_multi_unique_constraints(self):
+        # not implemented
+        return
+
+    @testing.skip("access")
     def test_get_noncol_index(self):
         # Access creates extra indexes that this test does not expect
         return
 
     @testing.skip("access")
+    def test_get_pk_constraint(self):
+        # PK constraint reflection (via Access.DAO) is "best effort"
+        return
+
+    @testing.skip("access")
     def test_get_unique_constraints(self):
         # Access barfs on DDL trying to create a constraint named "i.have.dots"
+        return
+
+    @testing.skip("access")
+    def test_not_existing_table(self):
         return
 
 
@@ -161,9 +197,19 @@ class FetchLimitOffsetTest(_FetchLimitOffsetTest):
         return
 
 
+class HasIndexTest(_HasIndexTest):
+    @testing.skip("access")
+    def test_has_index(self):
+        return
+
+
 class HasTableTest(_HasTableTest):
     @testing.skip("access")
     def test_has_table(self):
+        return
+
+    @testing.skip("access")
+    def test_has_table_cache(self):
         return
 
 
@@ -186,6 +232,10 @@ class IntegerTest(_IntegerTest):
     def test_huge_int(self):
         # bypass this test because Access ODBC fails with
         # [ODBC Microsoft Access Driver] Optional feature not implemented.
+        return
+
+    @testing.skip("access")
+    def test_huge_int_auto_accommodation(self):
         return
 
 
@@ -225,6 +275,10 @@ class LikeFunctionsTest(_LikeFunctionsTest):
         return
 
     @testing.skip("access")
+    def test_contains_unescaped(self):
+        return
+
+    @testing.skip("access")
     def test_endswith_autoescape(self):
         return
 
@@ -253,6 +307,24 @@ class LongNameBlowoutTest(_LongNameBlowoutTest):
     @testing.skip("access")
     def test_long_convention_name(self):
         # test generates names that are *way* too long for Access
+        return
+
+
+class NativeUUIDTest(_NativeUUIDTest):
+    @testing.skip("access")
+    def test_literal_text(self):
+        return
+
+    @testing.skip("access")
+    def test_literal_uuid(self):
+        return
+
+    @testing.skip("access")
+    def test_uuid_round_trip(self):
+        return
+
+    @testing.skip("access")
+    def test_uuid_text_round_trip(self):
         return
 
 
@@ -330,7 +402,31 @@ class QuotedNameArgumentTest(_QuotedNameArgumentTest):
         return
 
 
+class StringTest(_StringTest):
+    @testing.skip("access")
+    def test_concatenate_clauselist(self):
+        return
+
+
 class TableDDLTest(_TableDDLTest):
     @testing.skip("access")
     def test_underscore_names(self):
+        return
+
+
+class TrueDivTest(_TrueDivTest):
+    @testing.skip("access")
+    def test_floordiv_integer(self):
+        return
+
+    @testing.skip("access")
+    def test_floordiv_integer_bound(self):
+        return
+
+    @testing.skip("access")
+    def test_floordiv_numeric(self):
+        return
+
+    @testing.skip("access")
+    def test_truediv_numeric(self):
         return

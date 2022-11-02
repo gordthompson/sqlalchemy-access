@@ -6,6 +6,11 @@ sqlalchemy-access
 
 A Microsoft Access dialect for SQLAlchemy.
 
+The latest version of this dialect requires SQLAlchemy 2.0 or later.
+To work with earlier versions of SQLAlchemy, do::
+
+    pip install sqlalchemy-access<2.0.0
+
 Objectives
 ----------
 
