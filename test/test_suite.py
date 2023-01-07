@@ -20,6 +20,9 @@ from sqlalchemy.testing.suite import (
 from sqlalchemy.testing.suite import (
     FetchLimitOffsetTest as _FetchLimitOffsetTest,
 )
+from sqlalchemy.testing.suite import (
+    HasTableTest as _HasTableTest,
+)
 from sqlalchemy.testing.suite import InsertBehaviorTest as _InsertBehaviorTest
 from sqlalchemy.testing.suite import IntegerTest as _IntegerTest
 from sqlalchemy.testing.suite import JoinTest as _JoinTest
@@ -75,6 +78,12 @@ class DifficultParametersTest(_DifficultParametersTest):
     def test_round_trip(self):
         # bypass this test because "q?marks" case fails with
         # "COUNT field incorrect"
+        return
+
+    @testing.skip("access")
+    def test_round_trip_same_named_column(self):
+        # bypass this test because CREATE TABLE statements fail for
+        # "[BracketsAndCase]", "dot_s", and "q?marks" cases
         return
 
 
@@ -149,6 +158,12 @@ class FetchLimitOffsetTest(_FetchLimitOffsetTest):
     def test_limit_render_multiple_times(self):
         # bypass this test because Access ODBC fails with
         # "Query input must contain at least one table or query."
+        return
+
+
+class HasTableTest(_HasTableTest):
+    @testing.skip("access")
+    def test_has_table(self):
         return
 
 
