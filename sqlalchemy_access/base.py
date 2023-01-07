@@ -700,7 +700,7 @@ class AccessDialect(default.DefaultDialect):
         result = [
             row.table_name
             for row in pyodbc_crsr.tables().fetchall()
-            if row.table_name == tablename
+            if row.table_name.casefold() == tablename.casefold()
         ]
         return bool(result)
 
