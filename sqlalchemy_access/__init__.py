@@ -20,7 +20,7 @@ from .base import (
 
 import pyodbc
 
-__version__ = "2.0.1.dev0"
+__version__ = "2.0.1"
 
 pyodbc.pooling = False  # required for Access databases with ODBC linked tables
 _registry.register(

@@ -697,7 +697,7 @@ class AccessDialect(default.DefaultDialect):
     def last_inserted_ids(self):
         return self.context.last_inserted_ids
 
-    def has_table(self, connection, tablename, schema=None):
+    def has_table(self, connection, tablename, schema=None, info_cache=None):
         pyodbc_crsr = connection.connection.cursor()
         result = [
             row.table_name
