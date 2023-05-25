@@ -283,7 +283,10 @@ class AccessTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_BOOLEAN(self, type_, **kw):
         return YESNO.__visit_name__
-
+    
+    def visit_YESNO(self, type_, **kw):
+        return YESNO.__visit_name__
+    
     def visit_COUNTER(self, type_, **kw):
         return COUNTER.__visit_name__
 
