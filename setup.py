@@ -17,6 +17,7 @@ setup(
     version=VERSION,
     description="MS Access for SQLAlchemy",
     long_description=open(readme).read(),
+    long_description_content_type="text/x-rst",
     url="https://github.com/gordthompson/sqlalchemy-access",
     author="Gord Thompson",
     author_email="gord@gordthompson.com",
