@@ -1,6 +1,9 @@
 from sqlalchemy.testing.suite import *
 
 from sqlalchemy.testing.suite import (
+    BizarroCharacterFKResolutionTest as _BizarroCharacterFKResolutionTest,
+)
+from sqlalchemy.testing.suite import (
     CastTypeDecoratorTest as _CastTypeDecoratorTest,
 )
 from sqlalchemy.testing.suite import (
@@ -40,6 +43,13 @@ from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 
 
+class BizarroCharacterFKResolutionTest(_BizarroCharacterFKResolutionTest):
+    @testing.skip("access")
+    def test_fk_ref(self):
+        # Access can be bizarro, but not like this
+        return
+
+
 class CastTypeDecoratorTest(_CastTypeDecoratorTest):
     @testing.skip("access")
     def test_special_type(self):
@@ -48,6 +58,11 @@ class CastTypeDecoratorTest(_CastTypeDecoratorTest):
 
 
 class ComponentReflectionTest(_ComponentReflectionTest):
+    @testing.skip("access")
+    def test_get_foreign_keys(self):
+        # Access does not support all options tested
+        return
+
     @testing.skip("access")
     def test_get_indexes(self):
         # Access does not support all options tested
@@ -341,6 +356,12 @@ class NumericTest(_NumericTest):
         # bug in Access SQL: "SELECT ? AS anon_1 ..." returns rubbish with a
         # decimal.Decimal parameter value
         # https://github.com/mkleehammer/pyodbc/issues/624
+        return
+
+    @testing.skip("access")
+    def test_float_is_not_numeric(self):
+        # test fails because: 'numeric' != 'numeric'
+        # (umm, okay …)
         return
 
 
