@@ -11,8 +11,6 @@ Support for the Microsoft Access database.
 
 
 """
-import warnings
-
 import pyodbc
 from sqlalchemy import types, exc, pool
 from sqlalchemy.sql import compiler
@@ -675,7 +673,7 @@ class AccessDialect(default.DefaultDialect):
 
     supports_is_distinct_from = False
 
-    poolclass = pool.SingletonThreadPool
+    poolclass = pool.NullPool
     statement_compiler = AccessCompiler
     ddl_compiler = AccessDDLCompiler
     type_compiler = AccessTypeCompiler
