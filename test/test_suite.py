@@ -241,6 +241,10 @@ class InsertBehaviorTest(_InsertBehaviorTest):
         # [ODBC Microsoft Access Driver] Syntax error in INSERT INTO statement.
         return
 
+    @testing.skip("access")
+    def test_no_results_for_non_returning_insert(self):
+        return
+
 
 class IntegerTest(_IntegerTest):
     @testing.skip("access")
