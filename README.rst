@@ -4,7 +4,7 @@ sqlalchemy-access
 .. image:: https://img.shields.io/pypi/dm/sqlalchemy-access.svg
         :target: https://pypi.org/project/sqlalchemy-access/
 
-A Microsoft Access dialect for SQLAlchemy.
+A Microsoft Access dialect for SQLAlchemy on Windows.
 
 The latest version of this dialect requires SQLAlchemy 2.0 or later.
 To work with earlier versions of SQLAlchemy, do::
