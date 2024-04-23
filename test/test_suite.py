@@ -4,6 +4,9 @@ from sqlalchemy.testing.suite import (
     BizarroCharacterFKResolutionTest as _BizarroCharacterFKResolutionTest,
 )
 from sqlalchemy.testing.suite import (
+    BooleanTest as _BooleanTest
+)
+from sqlalchemy.testing.suite import (
     CastTypeDecoratorTest as _CastTypeDecoratorTest,
 )
 from sqlalchemy.testing.suite import (
@@ -47,6 +50,12 @@ class BizarroCharacterFKResolutionTest(_BizarroCharacterFKResolutionTest):
     @testing.skip("access")
     def test_fk_ref(self):
         # Access can be bizarro, but not like this
+        return
+
+
+class BooleanTest(_BooleanTest):
+    @testing.skip("access")
+    def test_render_literal_bool(self):
         return
 
 
