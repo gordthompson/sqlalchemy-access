@@ -30,7 +30,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Database :: Front-Ends",
-        "Operating System :: Windows",
+        "Operating System :: Microsoft :: Windows",
     ],
     keywords="SQLAlchemy Microsoft Access",
     project_urls={
