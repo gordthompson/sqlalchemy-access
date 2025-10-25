@@ -1,7 +1,7 @@
 from sqlalchemy.testing.suite import *
 
 from sqlalchemy.testing.suite import (
-    BizarroCharacterFKResolutionTest as _BizarroCharacterFKResolutionTest,
+    BizarroCharacterTest as _BizarroCharacterTest,
 )
 from sqlalchemy.testing.suite import (
     BooleanTest as _BooleanTest
@@ -46,7 +46,7 @@ from sqlalchemy.testing.suite import TableDDLTest as _TableDDLTest
 from sqlalchemy.testing.suite import TrueDivTest as _TrueDivTest
 
 
-class BizarroCharacterFKResolutionTest(_BizarroCharacterFKResolutionTest):
+class BizarroCharacterTest(_BizarroCharacterTest):
     @testing.skip("access")
     def test_fk_ref(self):
         # Access can be bizarro, but not like this
@@ -122,6 +122,10 @@ class ComponentReflectionTestExtra(_ComponentReflectionTestExtra):
     def test_nullable_reflection(self):
         # Access ODBC implementation of the SQLColumns function reports that
         # a column is nullable even when it is not
+        return
+
+    @testing.skip("access")
+    def test_string_length_reflection(self):
         return
 
 

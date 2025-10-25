@@ -94,6 +94,7 @@ These names are what you would retrieve from INFORMATION_SCHEMA.COLUMNS.DATA_TYP
 supported those types of system views.
 """
 ischema_names = {
+    "BINARY": types.BINARY,
     "BIT": YesNo,
     "BYTE": Byte,
     "CHAR": Char,
@@ -108,6 +109,7 @@ ischema_names = {
     "LONGCHAR": LongText,
     "REAL": Single,
     "SMALLINT": Integer,
+    "VARBINARY": types.VARBINARY,
     "VARCHAR": ShortText,
 }
 
